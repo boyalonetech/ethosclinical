@@ -2,7 +2,7 @@
 export const NAV_LINKS = [
   {
     name: "Home",
-    link: "home",
+    link: "",
   },
   {
     name: "About",

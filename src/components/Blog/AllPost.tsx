@@ -1,10 +1,11 @@
+"use client";
 import { BLOG_POSTS, CATEGORIES, CATEGORY_COLORS } from "@/app/data/blog";
 import { ArrowRight, Calendar, ChevronRight, Clock, Tag } from "lucide-react";
 import { useState } from "react";
 
 // Infer the type from the imported data
-type BlogPost = typeof BLOG_POSTS[number];
-type Category = typeof CATEGORIES[number];
+type BlogPost = (typeof BLOG_POSTS)[number];
+type Category = (typeof CATEGORIES)[number];
 
 // No need to redeclare variables - use imported directly
 export function AllPosts() {
@@ -46,67 +47,65 @@ export function AllPosts() {
           {filtered.map(
             (
               { category, title, excerpt, date, readTime, image }: BlogPost,
-              i: number
+              i: number,
             ) => (
               <article
                 key={i}
-                className="group relative rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 min-h-[480px]"
+                className="group relative rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 h-[370px]"
               >
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0">
-                    <picture>
-                  <img
+<picture>                  <img
                     src={image}
                     alt={title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  </picture>
+                  /></picture>
                   {/* Gradient overlay for text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/80 group-hover:via-black/40 transition-all duration-500" />
                 </div>
 
                 {/* Content Container */}
-                <div className="relative h-full min-h-[480px] flex flex-col justify-end p-6">
+                <div className="relative h-full flex flex-col justify-end p-5">
                   {/* Category Badge */}
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <span
-                      className={`inline-flex text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg ${CATEGORY_COLORS[category]} backdrop-blur-sm bg-opacity-90`}
+                      className={`inline-flex text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full shadow-lg ${CATEGORY_COLORS[category]} backdrop-blur-sm bg-opacity-90`}
                     >
                       {category}
                     </span>
                   </div>
 
-                  {/* Title */}
+                  {/* Title - Smaller font */}
                   <h3
-                    className="text-xl font-normal text-white leading-snug mb-2 group-hover:text-mint transition-colors line-clamp-2"
+                    className="text-sm sm:text-base font-normal text-white leading-tight mb-1.5 transition-colors line-clamp-2"
                     style={{ fontFamily: "'Bona Nova', serif" }}
                   >
                     {title}
                   </h3>
 
-                  {/* Excerpt */}
-                  <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-2">
+                  {/* Excerpt - Smaller text, fewer lines */}
+                  <p className="text-white/70 text-[11px] sm:text-xs leading-relaxed mb-3 line-clamp-2">
                     {excerpt}
                   </p>
 
-                  {/* Meta and Action */}
-                  <div className="pt-4 border-t border-white/20 flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-white/60 text-xs">
+                  {/* Meta and Action - Compact */}
+                  <div className="pt-2 border-t border-white/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs">
                       <span className="flex items-center gap-1">
-                        <Calendar size={11} />
+                        <Calendar size={10} />
                         {date}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Clock size={11} />
+                        <Clock size={10} />
                         {readTime}
                       </span>
                     </div>
                     <a
                       href="#"
-                      className="text-white hover:text-mint transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-sm p-2 rounded-full"
+                      className="text-white hover:text-mint transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-sm p-1.5 rounded-full"
                       aria-label="Read article"
                     >
-                      <ArrowRight size={16} />
+                      <ArrowRight size={12} />
                     </a>
                   </div>
                 </div>
