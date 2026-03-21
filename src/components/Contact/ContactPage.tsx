@@ -17,9 +17,9 @@ export default function ContactSection() {
   ) => setForm({ ...form, [e.target.name]: e.target.value });
 
   return (
-    <section className="py-10 px-6 lg:px-10 bg-stone-50">
+    <section className="py-10  lg:px-10 bg-stone-50">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-mintl rounded-2xl overflow-hidden">
+        <div className="bg-mintl lg:rounded-2xl overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* ── LEFT: Contact info ── */}
             <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-between gap-12">
@@ -61,7 +61,7 @@ export default function ContactSection() {
             </div>
 
             {/* ── RIGHT: Form ── */}
-            <div className="bg-white rounded-2xl m-3 sm:m-4 lg:m-6 p-8 sm:p-10 flex flex-col gap-8">
+            <div className="bg-white rounded-2xl my-3 sm:m-4 lg:m-6 p-8 sm:p-10 flex flex-col gap-8">
               <div className="flex flex-col gap-2">
                 <h2 className="text-3xl sm:text-4xl font-normal text-stone-900">
                   Write a Message
