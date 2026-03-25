@@ -289,11 +289,11 @@ export default function BlogPostPage() {
             </div>
 
             {/* Featured Image */}
-            <picture className="relative w-full aspect-[1000/643] rounded-[20px] overflow-hidden mb-8 shadow-lg">
+            <picture className="relative w-full aspect-[1000/643] rounded-2xl overflow-hidden mb-8 shadow-lg">
               <img
                 src={post.image}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-2xl"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
                     "https://placehold.co/1000x643?text=Blog+Image";
