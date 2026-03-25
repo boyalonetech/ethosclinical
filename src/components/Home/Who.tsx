@@ -15,14 +15,14 @@ export default function WhoWeAre() {
           <div className="rounded-2xl overflow-hidden bg-stone-200 aspect-video">
             <picture>
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80"
+                src="/about.jpg"
                 alt="Our team"
                 className="w-full h-full object-cover"
               />
             </picture>
           </div>
 
-          <div className="text-stone-600 text-base leading-relaxed space-y-4 mt-2">
+          <div className="text-black text-base leading-relaxed space-y-4 mt-2">
             <p>
               At Ethos Clinical Supervision, we take a different approach. We
               work with organisations and individual practitioners in some of

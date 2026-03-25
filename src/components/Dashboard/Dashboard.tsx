@@ -27,10 +27,10 @@ export default function Dashboard() {
     <section className="flex fixed w-full h-screen inset-0 bg-white z-60">
       {/* ✅ Pass the function as a prop */}
       <div>
-        <Sidebar onPageChange={handlePageChange} activePage={active} />
+        <Sidebar onPageChange={handlePageChange} activePage={active} />/
       </div>
-      <div className=" w-full h-full ml-66 overflow-y-scroll">
-        <p className="p-6 text-black font-bold text-5xl">{active}</p>
+      <div className=" w-full h-full ml-55 xl:ml-66 overflow-y-scroll">
+        {/* <p className="p-6 text-black font-bold text-5xl">{active}</p> */}
         {renderActivePage()}
       </div>
     </section>

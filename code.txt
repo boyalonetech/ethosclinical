@@ -1,0 +1,1819 @@
+1. use the sidebar modal in this code 
+
+"use client";
+
+import { db } from "@/backend/server";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Clock,
+  Calendar,
+  User,
+  Phone,
+  Mail,
+  UserCircle,
+  Users,
+  Building2,
+  Monitor,
+  MapPin,
+  PhoneCall,
+  X,
+  Eye,
+  CalendarCheck,
+  Layers,
+  Radio,
+} from "lucide-react";
+import { useState } from "react";
+
+// Constants with actual Lucide icons
+const SESSION_TYPES = [
+  {
+    icon: UserCircle,
+    label: "Individual",
+    desc: "One-on-one clinical supervision tailored to your specific practice needs and professional development goals.",
+    duration: "60 minutes",
+  },
+  {
+    icon: Users,
+    label: "Group",
+    desc: "Collaborative supervision with peers, ideal for sharing insights and building collective capacity.",
+    duration: "90 minutes",
+  },
+  {
+    icon: Building2,
+    label: "Organisational",
+    desc: "Supervision for teams or organisations, focusing on systemic issues and workplace wellbeing.",
+    duration: "120 minutes",
+  },
+];
+
+const DELIVERY_MODES = [
+  { icon: Monitor, label: "Online (Zoom)" },
+  { icon: MapPin, label: "In Person (Brisbane)" },
+  { icon: PhoneCall, label: "Phone Consultation" },
+];
+
+const TIME_SLOTS = [
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+];
+
+const ACCENT = "#8e9867";
+
+export default function BookingForm() {
+  const [sessionType, setSessionType] = useState("Individual");
+  const [deliveryMode, setDeliveryMode] = useState("Online (Zoom)");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [alternateDate, setAlternateDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    organisation: "",
+    role: "",
+    context: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async () => {
+    if (!agreed) {
+      setError("Please agree to the privacy policy");
+      return;
+    }
+    if (!form.firstName || !form.lastName || !form.email || !form.context) {
+      setError("Please fill in all required fields");
+      return;
+    }
+    if (!preferredDate || !selectedSlot) {
+      setError("Please select preferred date and time slot");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const bookingData = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone || "",
+        organisation: form.organisation || "",
+        role: form.role || "",
+        context: form.context,
+        sessionType,
+        deliveryMode,
+        preferredDate,
+        alternateDate: alternateDate || "",
+        preferredTimeSlot: selectedSlot,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      const record = await db.collection("bookings").create(bookingData);
+      console.log("Booking created successfully:", record);
+      setSubmitted(true);
+      setShowSidebar(true);
+    } catch (err: any) {
+      console.error("Error creating booking:", err);
+      setError(err.message || "Failed to submit booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetForm = () => {
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      organisation: "",
+      role: "",
+      context: "",
+    });
+    setPreferredDate("");
+    setAlternateDate("");
+    setSelectedSlot("");
+    setAgreed(false);
+    setSubmitted(false);
+    setShowSidebar(false);
+  };
+
+  return (
+    <>
+      <section className="py-14 px-6 lg:px-10 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header row with eye icon */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-1 h-5 rounded-full"
+                style={{ backgroundColor: ACCENT }}
+              />
+              <p className="text-sm font-semibold uppercase tracking-widest text-gray-600">
+                Book Your Session
+              </p>
+            </div>
+
+            {/* Eye icon — opens sidebar to preview booking summary */}
+            {submitted && (
+              <button
+                onClick={() => setShowSidebar(true)}
+                title="View booking summary"
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border border-black text-black hover:bg-black hover:text-white transition-all duration-200"
+              >
+                <Eye size={15} />
+                View Summary
+              </button>
+            )}
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* ── LEFT SIDEBAR ── */}
+            <div className="flex flex-col gap-6">
+              {/* Session type */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+                <h3 className="font-semibold text-base text-black">
+                  Session Type
+                </h3>
+                <div className="flex flex-col gap-3">
+                  {SESSION_TYPES.map(({ icon: Icon, label, desc, duration }) => {
+                    const active = sessionType === label;
+                    return (
+                      <button
+                        key={label}
+                        onClick={() => setSessionType(label)}
+                        className="w-full text-left p-4 rounded-xl border transition-all flex flex-col gap-2"
+                        style={{
+                          backgroundColor: active ? "#f9f9f7" : "white",
+                          borderColor: active ? ACCENT : "#e5e7eb",
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Icon
+                              size={15}
+                              style={{ color: active ? ACCENT : "#9ca3af" }}
+                            />
+                            <span
+                              className="text-sm font-semibold"
+                              style={{ color: active ? ACCENT : "#4b5563" }}
+                            >
+                              {label}
+                            </span>
+                          </div>
+                          <div
+                            className="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                            style={{
+                              borderColor: active ? ACCENT : "#d1d5db",
+                            }}
+                          >
+                            {active && (
+                              <div
+                                className="w-2 h-2 rounded-full"
+                                style={{ backgroundColor: ACCENT }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs leading-relaxed text-black/90">
+                          {desc}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="flex items-center gap-1 text-gray-500">
+                            <Clock size={10} />
+                            {duration}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Delivery mode */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+                <h3 className="font-semibold text-base text-black">
+                  Delivery Mode
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {DELIVERY_MODES.map(({ icon: Icon, label }) => {
+                    const active = deliveryMode === label;
+                    return (
+                      <button
+                        key={label}
+                        onClick={() => setDeliveryMode(label)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all"
+                        style={{
+                          backgroundColor: active ? "#f9f9f7" : "white",
+                          borderColor: active ? ACCENT : "#e5e7eb",
+                          color: active ? ACCENT : "#4b5563",
+                        }}
+                      >
+                        <Icon
+                          size={15}
+                          style={{ color: active ? ACCENT : "#9ca3af" }}
+                        />
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Contact info */}
+              <div className="bg-white shadow rounded-2xl p-6 flex flex-col gap-4">
+                <p className="text-gray-900 text-xs uppercase tracking-widest font-medium">
+                  Need help?
+                </p>
+                <div className="flex flex-col gap-3">
+                  {[
+                    {
+                      icon: Phone,
+                      value: "0491 046 780",
+                      href: "tel:0491046780",
+                    },
+                    {
+                      icon: Mail,
+                      value: "stephenonyekwere@gmail.com",
+                      href: "mailto:stephenonyekwere@gmail.com",
+                    },
+                  ].map(({ icon: Icon, value, href }) => (
+                    <a
+                      key={value}
+                      href={href}
+                      className="flex items-center gap-3 text-gray-700 text-sm hover:text-white transition-colors"
+                    >
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: ACCENT }}
+                      >
+                        <Icon size={14} className="text-gray-50" />
+                      </div>
+                      {value}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── MAIN FORM ── */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+              {/* Date & Time */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-5">
+                <h3 className="font-semibold text-base flex items-center gap-2 text-black">
+                  <Calendar size={16} className="text-gray-500" /> Preferred
+                  Date & Time
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Preferred Date{" "}
+                      <span style={{ color: ACCENT }}>*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={preferredDate}
+                      onChange={(e) => setPreferredDate(e.target.value)}
+                      className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-600 bg-transparent transition-colors"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-black">
+                      Alternate Date
+                    </label>
+                    <input
+                      type="date"
+                      value={alternateDate}
+                      onChange={(e) => setAlternateDate(e.target.value)}
+                      className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-600 bg-transparent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                    Preferred Time Slot{" "}
+                    <span style={{ color: ACCENT }}>*</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {TIME_SLOTS.map((slot) => {
+                      const active = selectedSlot === slot;
+                      return (
+                        <button
+                          key={slot}
+                          onClick={() => setSelectedSlot(slot)}
+                          className="px-3 py-1.5 rounded-lg border text-sm font-medium transition-all"
+                          style={{
+                            backgroundColor: active ? ACCENT : "white",
+                            borderColor: active ? ACCENT : "#e5e7eb",
+                            color: active ? "white" : "#4b5563",
+                          }}
+                        >
+                          {slot}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal details */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-5">
+                <h3 className="font-semibold text-base flex items-center gap-2 text-black">
+                  <User size={16} className="text-gray-500" /> Your Details
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {[
+                    { name: "firstName", label: "First Name", placeholder: "Jane" },
+                    { name: "lastName", label: "Last Name", placeholder: "Smith" },
+                  ].map(({ name, label, placeholder }) => (
+                    <div key={name} className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                        {label} <span style={{ color: ACCENT }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name={name}
+                        value={(form as any)[name]}
+                        onChange={handleChange}
+                        placeholder={placeholder}
+                        className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors"
+                        required
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Email <span style={{ color: ACCENT }}>*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail
+                        size={13}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="you@example.com"
+                        className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 pl-5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <Phone
+                        size={13}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        placeholder="0491 000 000"
+                        className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 pl-5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Organisation (if applicable)
+                    </label>
+                    <input
+                      type="text"
+                      name="organisation"
+                      value={form.organisation}
+                      onChange={handleChange}
+                      placeholder="e.g. Family Spirit"
+                      className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Your Role
+                    </label>
+                    <input
+                      type="text"
+                      name="role"
+                      value={form.role}
+                      onChange={handleChange}
+                      placeholder="e.g. Therapeutic Specialist"
+                      className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                    What brings you to supervision?{" "}
+                    <span style={{ color: ACCENT }}>*</span>
+                  </label>
+                  <textarea
+                    name="context"
+                    value={form.context}
+                    onChange={handleChange}
+                    placeholder="Share a little about your practice context, what you're hoping to work on, or any specific challenges you're navigating…"
+                    rows={4}
+                    className="w-full border-b border-gray-200 focus:border-gray-400 outline-none py-2.5 text-sm text-gray-700 placeholder:text-gray-400 bg-transparent transition-colors resize-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-5">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <div
+                    onClick={() => setAgreed(!agreed)}
+                    className="w-5 h-5 mt-0.5 rounded border shrink-0 flex items-center justify-center transition-all"
+                    style={{
+                      backgroundColor: agreed ? ACCENT : "white",
+                      borderColor: agreed ? ACCENT : "#d1d5db",
+                    }}
+                  >
+                    {agreed && (
+                      <svg viewBox="0 0 12 10" fill="none" className="w-3 h-3">
+                        <path
+                          d="M1 5l3 3 7-7"
+                          stroke="white"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-sm leading-relaxed text-gray-600">
+                    I agree to the{" "}
+                    <a
+                      href="#"
+                      className="underline underline-offset-2 transition-colors"
+                      style={{ color: ACCENT }}
+                    >
+                      Privacy Policy
+                    </a>{" "}
+                    and consent to Ethos Clinical Supervision contacting me to
+                    confirm this booking.
+                  </span>
+                </label>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <p className="text-xs leading-relaxed max-w-xs text-gray-400">
+                    You'll receive a confirmation within 24 hours.
+                  </p>
+                  <button
+                    disabled={!agreed || isSubmitting}
+                    onClick={handleSubmit}
+                    className="disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold px-7 py-3.5 rounded-lg transition-all flex items-center gap-2 whitespace-nowrap"
+                    style={{ backgroundColor: ACCENT }}
+                    onMouseEnter={(e) =>
+                      ((e.target as HTMLButtonElement).style.backgroundColor =
+                        "#000")
+                    }
+                    onMouseLeave={(e) =>
+                      ((e.target as HTMLButtonElement).style.backgroundColor =
+                        ACCENT)
+                    }
+                  >
+                    {isSubmitting ? "Submitting..." : "Request Booking"}
+                    <ArrowRight size={15} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SIDEBAR MODAL ── */}
+      {/* Backdrop */}
+      <div
+        onClick={() => setShowSidebar(false)}
+        className="fixed inset-0 z-40 transition-all duration-300"
+        style={{
+          backgroundColor: showSidebar ? "rgba(0,0,0,0.45)" : "transparent",
+          pointerEvents: showSidebar ? "auto" : "none",
+          backdropFilter: showSidebar ? "blur(2px)" : "none",
+        }}
+      />
+
+      {/* Sidebar panel */}
+      <div
+        className="fixed top-0 right-0 h-full z-50 bg-white shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 ease-in-out"
+        style={{
+          width: "min(440px, 100vw)",
+          transform: showSidebar ? "translateX(0)" : "translateX(100%)",
+        }}
+      >
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-5 border-b border-gray-100"
+          style={{ backgroundColor: ACCENT }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <CheckCircle2 size={16} className="text-white" />
+            </div>
+            <div>
+              <p className="text-white font-semibold text-base leading-none">
+                Booking Confirmed
+              </p>
+              <p className="text-white/70 text-xs mt-0.5">
+                Summary of your request
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors"
+          >
+            <X size={16} className="text-white" />
+          </button>
+        </div>
+
+        {/* Body — scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
+          {/* Success message */}
+          <div className="rounded-xl bg-gray-50 border border-gray-100 p-5">
+            <p className="text-black text-sm leading-relaxed">
+              Thank you,{" "}
+              <span className="font-semibold">{form.firstName || "there"}</span>
+              ! Stephen will review your request and be in touch within{" "}
+              <span className="font-semibold">24 hours</span> to confirm your
+              session.
+            </p>
+          </div>
+
+          {/* Booking details */}
+          <div className="flex flex-col gap-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              Booking Details
+            </p>
+
+            {/* Session & Delivery */}
+            <div className="rounded-xl border border-gray-100 overflow-hidden divide-y divide-gray-100">
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <Layers size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Session Type</p>
+                  <p className="text-sm font-medium text-black">{sessionType}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <Radio size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Delivery Mode</p>
+                  <p className="text-sm font-medium text-black">{deliveryMode}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <CalendarCheck size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Preferred Date</p>
+                  <p className="text-sm font-medium text-black">
+                    {preferredDate
+                      ? new Date(preferredDate).toLocaleDateString("en-AU", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+              {alternateDate && (
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                  <Calendar size={14} style={{ color: ACCENT }} className="shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Alternate Date</p>
+                    <p className="text-sm font-medium text-black">
+                      {new Date(alternateDate).toLocaleDateString("en-AU", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <Clock size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Time Slot</p>
+                  <p className="text-sm font-medium text-black">
+                    {selectedSlot || "—"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact details */}
+          <div className="flex flex-col gap-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              Your Details
+            </p>
+            <div className="rounded-xl border border-gray-100 overflow-hidden divide-y divide-gray-100">
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <User size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Full Name</p>
+                  <p className="text-sm font-medium text-black">
+                    {[form.firstName, form.lastName].filter(Boolean).join(" ") ||
+                      "—"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                <Mail size={14} style={{ color: ACCENT }} className="shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Email</p>
+                  <p className="text-sm font-medium text-black">
+                    {form.email || "—"}
+                  </p>
+                </div>
+              </div>
+              {form.phone && (
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                  <Phone size={14} style={{ color: ACCENT }} className="shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Phone</p>
+                    <p className="text-sm font-medium text-black">{form.phone}</p>
+                  </div>
+                </div>
+              )}
+              {form.organisation && (
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                  <Building2
+                    size={14}
+                    style={{ color: ACCENT }}
+                    className="shrink-0"
+                  />
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Organisation</p>
+                    <p className="text-sm font-medium text-black">
+                      {form.organisation}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {form.role && (
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-white">
+                  <UserCircle
+                    size={14}
+                    style={{ color: ACCENT }}
+                    className="shrink-0"
+                  />
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Role</p>
+                    <p className="text-sm font-medium text-black">{form.role}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Context */}
+          {form.context && (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                Your Context
+              </p>
+              <div className="rounded-xl border border-gray-100 px-4 py-4 bg-white">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {form.context}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        <div className="px-6 py-5 border-t border-gray-100 flex flex-col gap-3 bg-white">
+          <button
+            onClick={handleResetForm}
+            className="w-full text-white text-sm font-semibold px-6 py-3 rounded-lg transition-colors"
+            style={{ backgroundColor: ACCENT }}
+            onMouseEnter={(e) =>
+              ((e.target as HTMLButtonElement).style.backgroundColor = "#000")
+            }
+            onMouseLeave={(e) =>
+              ((e.target as HTMLButtonElement).style.backgroundColor = ACCENT)
+            }
+          >
+            Make Another Booking
+          </button>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="w-full border border-black text-black text-sm font-medium px-6 py-3 rounded-lg hover:bg-black hover:text-white transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+and change the popup dtails modal in this code to look exactly like the sidebar modal side bar in that code
+
+
+
+
+
+
+
+  "use client";
+
+  import { db } from "@/backend/server";
+  import {
+    CheckCircle2,
+    Clock,
+    Calendar,
+    User,
+    Mail,
+    UserCircle,
+    Users,
+    Building2,
+    Monitor,
+    MapPin,
+    PhoneCall,
+    Eye,
+    Check,
+    X,
+    RefreshCw,
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    Download,
+    MessageSquare,
+    Briefcase,
+    Info,
+    ChevronDown,
+    ChevronUp,
+    AlertCircle,
+    Menu,
+    Phone,
+    Trash2,
+    LayoutDashboard,
+    TrendingUp,
+    Filter,
+    Sparkles,
+    Star,
+    Heart,
+    ArrowRight,
+  } from "lucide-react";
+  import { useState, useEffect } from "react";
+
+  /* ─────────────────────────────────────────────
+    CONSTANTS
+  ───────────────────────────────────────────── */
+  const STATUS_OPTIONS = [
+    {
+      value: "pending",
+      label: "Pending",
+      dot: "bg-amber-400",
+      badge: "bg-amber-50 text-amber-700 border-amber-200",
+      icon: Clock,
+    },
+    {
+      value: "confirmed",
+      label: "Confirmed",
+      dot: "bg-emerald-500",
+      badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: CheckCircle2,
+    },
+    {
+      value: "completed",
+      label: "Completed",
+      dot: "bg-slate-400",
+      badge: "bg-slate-50 text-slate-600 border-slate-200",
+      icon: Check,
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled",
+      dot: "bg-rose-400",
+      badge: "bg-rose-50 text-rose-600 border-rose-200",
+      icon: X,
+    },
+  ];
+
+  const ITEMS_PER_PAGE = 8;
+
+  const STAT_CARDS = [
+    {
+      key: "total",
+      label: "Total Bookings",
+      icon: LayoutDashboard,
+      gradient: "from-mint-50 to-mint-100",
+      color: "text-mint-700",
+    },
+    {
+      key: "pending",
+      label: "Pending Review",
+      icon: Clock,
+      gradient: "from-amber-50 to-amber-100",
+      color: "text-amber-600",
+    },
+    {
+      key: "confirmed",
+      label: "Confirmed",
+      icon: CheckCircle2,
+      gradient: "from-emerald-50 to-emerald-100",
+      color: "text-emerald-600",
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      icon: Star,
+      gradient: "from-slate-50 to-slate-100",
+      color: "text-slate-500",
+    },
+  ];
+
+  /* ─────────────────────────────────────────────
+    HELPERS
+  ───────────────────────────────────────────── */
+  const getSessionIcon = (type: string) => {
+    if (type === "Group") return Users;
+    if (type === "Organisational") return Building2;
+    return UserCircle;
+  };
+
+  const getDeliveryIcon = (mode: string) => {
+    if (mode?.includes("Online")) return Monitor;
+    if (mode?.includes("In Person") || mode?.includes("In-Person")) return MapPin;
+    return PhoneCall;
+  };
+
+  const getStatus = (status: string) =>
+    STATUS_OPTIONS.find((s) => s.value === status) ?? STATUS_OPTIONS[0];
+
+  /* ─────────────────────────────────────────────
+    STATUS BADGE
+  ───────────────────────────────────────────── */
+  function StatusBadge({ status }: { status: string }) {
+    const s = getStatus(status);
+    const Icon = s.icon;
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${s.badge} shadow-sm`}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full ${s.dot} animate-pulse`} />
+        {s.label}
+      </span>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
+    GRADIENT CARD
+  ───────────────────────────────────────────── */
+  function StatCard({ label, value, icon: Icon, gradient, color }: any) {
+    return (
+      <div
+        className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-5 transition-all hover:scale-[1.02] duration-300 shadow-sm hover:shadow-md`}
+      >
+        <div className="absolute top-0 right-0 w-20 h-20 opacity-10">
+          <Icon size={80} className="text-current" />
+        </div>
+        <div className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+            {label}
+          </p>
+          <p className={`text-3xl font-bold ${color} mb-1`}>{value}</p>
+          <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
+            <TrendingUp size={12} />
+            <span>+{Math.floor(Math.random() * 20)}% this week</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
+    COLLAPSIBLE SECTION
+  ───────────────────────────────────────────── */
+  function Section({
+    icon: Icon,
+    title,
+    children,
+    expanded,
+    onToggle,
+  }: {
+    icon: any;
+    title: string;
+    children: React.ReactNode;
+    expanded: boolean;
+    onToggle: () => void;
+  }) {
+    return (
+      <div className="rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+        <button
+          onClick={onToggle}
+          className="w-full px-5 py-4 bg-gradient-to-r from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 transition-all duration-300 flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-mint-400 to-mint-600 flex items-center justify-center shadow-sm">
+              <Icon size={14} className="text-white" />
+            </div>
+            <span className="font-semibold text-gray-800 text-sm tracking-wide">
+              {title}
+            </span>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center group-hover:border-mint-300 transition-colors">
+            {expanded ? (
+              <ChevronUp size={14} className="text-mint-500" />
+            ) : (
+              <ChevronDown size={14} className="text-gray-400" />
+            )}
+          </div>
+        </button>
+        {expanded && (
+          <div className="p-5 bg-white border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
+    DETAIL ROW
+  ───────────────────────────────────────────── */
+  function DetailRow({
+    label,
+    value,
+    icon: Icon,
+  }: {
+    label: string;
+    value?: string;
+    icon?: any;
+  }) {
+    return (
+      <div className="group">
+        <div className="flex items-center gap-2 mb-1">
+          {Icon && <Icon size={12} className="text-mint-400" />}
+          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            {label}
+          </p>
+        </div>
+        <p className="text-sm text-gray-800 font-medium leading-relaxed">
+          {value || (
+            <span className="text-gray-300 font-normal italic">Not provided</span>
+          )}
+        </p>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
+    DETAIL MODAL
+  ───────────────────────────────────────────── */
+  function DetailModal({
+    booking,
+    onClose,
+    onUpdateStatus,
+    onDelete,
+    updating,
+  }: any) {
+    const [expandedSections, setExpandedSections] = useState({
+      client: true,
+      session: true,
+      context: true,
+      metadata: false,
+    });
+
+    const toggleSection = (section: string) => {
+      setExpandedSections((prev: any) => ({
+        ...prev,
+        [section]: !prev[section],
+      }));
+    };
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={onClose}
+        />
+
+        {/* Modal */}
+        <div className="relative w-full sm:max-w-2xl max-h-[90vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom duration-300 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-5 flex items-center justify-between gap-4 shrink-0">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-mint-400 to-mint-600 rounded-xl blur opacity-50" />
+                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-mint-500 to-mint-700 flex items-center justify-center shadow-lg">
+                  <User size={20} className="text-white" />
+                </div>
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-white text-lg leading-tight truncate">
+                  {booking.firstName} {booking.lastName}
+                </p>
+                <p className="text-gray-400 text-xs truncate mt-1">
+                  {booking.email}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl hover:bg-white/10 transition-all duration-300"
+            >
+              <X size={18} className="text-gray-400 hover:text-white" />
+            </button>
+          </div>
+
+          {/* Status control */}
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3 shrink-0 bg-gray-50">
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} className="text-mint-500" />
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                Current Status
+              </p>
+            </div>
+            <select
+              value={booking.status}
+              onChange={(e) => onUpdateStatus(booking.id, e.target.value)}
+              disabled={updating}
+              className="px-3 py-1.5 text-sm font-semibold rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-mint-400 cursor-pointer transition-all"
+            >
+              {STATUS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+            {/* Client info */}
+            <Section
+              icon={User}
+              title="Client Information"
+              expanded={expandedSections.client}
+              onToggle={() => toggleSection("client")}
+            >
+              <div className="grid grid-cols-2 gap-5">
+                <DetailRow
+                  icon={User}
+                  label="First Name"
+                  value={booking.firstName}
+                />
+                <DetailRow
+                  icon={User}
+                  label="Last Name"
+                  value={booking.lastName}
+                />
+                <div className="col-span-2">
+                  <DetailRow icon={Mail} label="Email" value={booking.email} />
+                </div>
+                <DetailRow icon={Phone} label="Phone" value={booking.phone} />
+                <DetailRow
+                  icon={Building2}
+                  label="Organisation"
+                  value={booking.organisation}
+                />
+                <div className="col-span-2">
+                  <DetailRow icon={Briefcase} label="Role" value={booking.role} />
+                </div>
+              </div>
+            </Section>
+
+            {/* Session details */}
+            <Section
+              icon={Briefcase}
+              title="Session Details"
+              expanded={expandedSections.session}
+              onToggle={() => toggleSection("session")}
+            >
+              <div className="grid grid-cols-2 gap-5">
+                <DetailRow
+                  icon={Briefcase}
+                  label="Session Type"
+                  value={booking.sessionType}
+                />
+                <DetailRow
+                  icon={MapPin}
+                  label="Delivery Mode"
+                  value={booking.deliveryMode}
+                />
+                <DetailRow
+                  icon={Calendar}
+                  label="Preferred Date"
+                  value={booking.preferredDate}
+                />
+                <DetailRow
+                  icon={Clock}
+                  label="Time Slot"
+                  value={booking.preferredTimeSlot}
+                />
+                {booking.alternateDate && (
+                  <div className="col-span-2">
+                    <DetailRow
+                      icon={Calendar}
+                      label="Alternate Date"
+                      value={booking.alternateDate}
+                    />
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            {/* Supervision context */}
+            <Section
+              icon={MessageSquare}
+              title="Supervision Context"
+              expanded={expandedSections.context}
+              onToggle={() => toggleSection("context")}
+            >
+              <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-100">
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {booking.context || (
+                    <span className="text-gray-400 italic">
+                      No context provided.
+                    </span>
+                  )}
+                </p>
+              </div>
+            </Section>
+
+            {/* Metadata */}
+            <Section
+              icon={Info}
+              title="Metadata"
+              expanded={expandedSections.metadata}
+              onToggle={() => toggleSection("metadata")}
+            >
+              <div className="space-y-4">
+                <DetailRow
+                  icon={Calendar}
+                  label="Created At"
+                  value={new Date(booking.createdAt).toLocaleString()}
+                />
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Info size={12} className="text-mint-400" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                      Booking ID
+                    </p>
+                  </div>
+                  <p className="text-xs font-mono text-gray-500 bg-gray-50 p-2 rounded-lg break-all">
+                    {booking.id}
+                  </p>
+                </div>
+              </div>
+            </Section>
+          </div>
+
+          {/* Action buttons */}
+          <div className="shrink-0 border-t border-gray-100 p-6 space-y-3 bg-gray-50">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => onUpdateStatus(booking.id, "confirmed")}
+                disabled={updating || booking.status === "confirmed"}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <CheckCircle2 size={15} /> Confirm
+              </button>
+              <button
+                onClick={() => onUpdateStatus(booking.id, "completed")}
+                disabled={updating || booking.status === "completed"}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Check size={15} /> Complete
+              </button>
+            </div>
+            <button
+              onClick={() => onUpdateStatus(booking.id, "cancelled")}
+              disabled={updating || booking.status === "cancelled"}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-rose-200 hover:border-rose-400 text-rose-600 hover:text-rose-700 text-sm font-semibold transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed bg-white"
+            >
+              <X size={15} /> Cancel Booking
+            </button>
+            <button
+              onClick={() => onDelete(booking.id)}
+              disabled={updating}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-300 hover:text-red-600 text-sm font-semibold transition-all duration-300 disabled:opacity-40"
+            >
+              <Trash2 size={15} /> Delete Permanently
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
+    MAIN COMPONENT
+  ───────────────────────────────────────────── */
+  export default function AdminBookings() {
+    const [bookings, setBookings] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [selectedBooking, setSelectedBooking] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [updating, setUpdating] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    /* Responsive */
+    useEffect(() => {
+      const check = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      check();
+      window.addEventListener("resize", check);
+      return () => window.removeEventListener("resize", check);
+    }, []);
+
+    /* Fetch */
+    const fetchBookings = async () => {
+      try {
+        setLoading(true);
+        const records = await db
+          .collection("bookings")
+          .getFullList({ sort: "-createdAt" });
+        setBookings(records);
+        setError("");
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch bookings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      fetchBookings();
+    }, []);
+
+    /* Update status */
+    const updateStatus = async (id: string, newStatus: string) => {
+      try {
+        setUpdating(true);
+        await db.collection("bookings").update(id, { status: newStatus });
+        await fetchBookings();
+        if (selectedBooking?.id === id)
+          setSelectedBooking({ ...selectedBooking, status: newStatus });
+        setError("");
+      } catch (err: any) {
+        setError(err.message || "Failed to update status");
+      } finally {
+        setUpdating(false);
+      }
+    };
+
+    /* Delete */
+    const deleteBooking = async (id: string) => {
+      if (!confirm("Delete this booking permanently?")) return;
+      try {
+        setUpdating(true);
+        await db.collection("bookings").delete(id);
+        await fetchBookings();
+        if (selectedBooking?.id === id) {
+          setSelectedBooking(null);
+          setIsModalOpen(false);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to delete booking");
+      } finally {
+        setUpdating(false);
+      }
+    };
+
+    /* Handle booking click */
+    const handleBookingClick = (booking: any) => {
+      setSelectedBooking(booking);
+      setIsModalOpen(true);
+      if (isMobile) setIsMenuOpen(false);
+    };
+
+    /* Filter & paginate */
+    const filtered = bookings.filter((b) => {
+      const q = searchTerm.toLowerCase();
+      const matchSearch =
+        b.firstName?.toLowerCase().includes(q) ||
+        b.lastName?.toLowerCase().includes(q) ||
+        b.email?.toLowerCase().includes(q) ||
+        b.phone?.toLowerCase().includes(q);
+      return matchSearch && (statusFilter === "all" || b.status === statusFilter);
+    });
+
+    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    const paginated = filtered.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE,
+    );
+
+    /* Stats */
+    const stats = {
+      total: bookings.length,
+      pending: bookings.filter((b) => b.status === "pending").length,
+      confirmed: bookings.filter((b) => b.status === "confirmed").length,
+      completed: bookings.filter((b) => b.status === "completed").length,
+    };
+
+    /* Export CSV */
+    const exportToCSV = () => {
+      const headers = [
+        "Date",
+        "Name",
+        "Email",
+        "Phone",
+        "Session Type",
+        "Delivery Mode",
+        "Preferred Date",
+        "Time Slot",
+        "Status",
+      ];
+      const rows = filtered.map((b) => [
+        new Date(b.createdAt).toLocaleDateString(),
+        `${b.firstName} ${b.lastName}`,
+        b.email,
+        b.phone || "-",
+        b.sessionType,
+        b.deliveryMode,
+        b.preferredDate,
+        b.preferredTimeSlot,
+        b.status,
+      ]);
+      const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `bookings_${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    /* ─── Loading ─── */
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+          <div className="text-center flex flex-col items-center gap-6">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-mint-400 to-mint-600 animate-pulse" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Sparkles size={32} className="text-white animate-spin" />
+              </div>
+            </div>
+            <p className="text-gray-500 font-medium">Loading your bookings...</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white font-['Inter',system-ui]">
+        {/* ── TOP NAV ── */}
+        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 sm:px-8 py-4 flex items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-mint-400 to-mint-600 rounded-xl blur opacity-50" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-mint-500 to-mint-700 flex items-center justify-center shadow-lg">
+                <LayoutDashboard size={18} className="text-white" />
+              </div>
+            </div>
+            <div>
+              <h1 className="font-bold text-gray-800 text-lg leading-tight">
+                Ethos Admin
+              </h1>
+              <p className="text-gray-400 text-xs hidden sm:block">
+                Booking Management Dashboard
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchBookings}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-all duration-300 group"
+              title="Refresh"
+            >
+              <RefreshCw
+                size={18}
+                className="text-gray-500 group-hover:text-mint-500 transition-colors"
+              />
+            </button>
+            <button
+              onClick={exportToCSV}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white text-sm font-medium rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+            >
+              <Download size={15} /> Export CSV
+            </button>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="sm:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-300"
+            >
+              <Menu size={18} className="text-gray-600" />
+            </button>
+          </div>
+        </header>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobile && isMenuOpen && (
+          <div className="fixed top-[65px] right-4 z-30 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 animate-in slide-in-from-top-2 duration-200 min-w-[180px]">
+            <button
+              onClick={() => {
+                exportToCSV();
+                setIsMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors text-sm text-gray-700"
+            >
+              <Download size={16} className="text-mint-500" />
+              Export CSV
+            </button>
+          </div>
+        )}
+
+        {/* ── BODY ── */}
+        <div className="flex-1 overflow-y-auto py-6 sm:py-8 px-4 sm:px-8">
+          {/* Error */}
+          {error && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-rose-50 to-white border border-rose-200 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top duration-300">
+              <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                <AlertCircle size={16} className="text-rose-500" />
+              </div>
+              <p className="text-rose-600 text-sm flex-1">{error}</p>
+              <button
+                onClick={() => setError("")}
+                className="text-rose-400 hover:text-rose-600"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5 mb-6 sm:mb-8">
+            {STAT_CARDS.map(({ key, label, icon, gradient, color }) => (
+              <StatCard
+                key={key}
+                label={label}
+                value={(stats as any)[key]}
+                icon={icon}
+                gradient={gradient}
+                color={color}
+              />
+            ))}
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  type="text"
+                  placeholder="Search by name, email or phone..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-mint-400 focus:border-transparent bg-gray-50 transition-all"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Filter size={14} className="text-gray-400 shrink-0" />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-mint-400 transition-all"
+                >
+                  <option value="all">All Status</option>
+                  {STATUS_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Booking list */}
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+            {/* Desktop header */}
+            <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+              <div className="col-span-2">Received</div>
+              <div className="col-span-3">Client</div>
+              <div className="col-span-3">Session</div>
+              <div className="col-span-2">Preferred Date</div>
+              <div className="col-span-1">Status</div>
+              <div className="col-span-1 text-right">Actions</div>
+            </div>
+
+            <div className="divide-y divide-gray-50">
+              {paginated.length === 0 ? (
+                <div className="py-16 sm:py-20 text-center flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <Heart size={28} className="text-gray-300" />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 font-medium">No bookings found</p>
+                    <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                      Try adjusting your search or filters
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                paginated.map((booking) => {
+                  const SessionIcon = getSessionIcon(booking.sessionType);
+                  const DeliveryIcon = getDeliveryIcon(booking.deliveryMode);
+
+                  return (
+                    <div
+                      key={booking.id}
+                      onClick={() => handleBookingClick(booking)}
+                      className="group cursor-pointer transition-all duration-300 px-4 sm:px-6 py-4 hover:bg-gray-50"
+                    >
+                      {/* Mobile layout */}
+                      <div className="md:hidden space-y-3">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-800 text-sm truncate">
+                              {booking.firstName} {booking.lastName}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate mt-0.5">
+                              {booking.email}
+                            </p>
+                          </div>
+                          <StatusBadge status={booking.status} />
+                        </div>
+                        <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                          <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                            <Calendar size={11} className="text-mint-400" />
+                            {new Date(booking.createdAt).toLocaleDateString()}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                            <SessionIcon size={11} className="text-mint-400" />
+                            {booking.sessionType}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                            <Clock size={11} className="text-mint-400" />
+                            {booking.preferredDate}
+                          </span>
+                        </div>
+                        <div className="flex justify-end">
+                          <button className="text-mint-500 text-xs font-medium flex items-center gap-1">
+                            View Details <ArrowRight size={12} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Desktop layout */}
+                      <div className="hidden md:grid md:grid-cols-12 gap-4 items-center">
+                        <div className="col-span-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-mint-100 to-mint-200 flex items-center justify-center">
+                              <Calendar size={12} className="text-mint-600" />
+                            </div>
+                            <span className="text-sm text-gray-600">
+                              {new Date(booking.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="col-span-3">
+                          <p className="font-semibold text-gray-800 text-sm leading-none">
+                            {booking.firstName} {booking.lastName}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1 truncate">
+                            {booking.email}
+                          </p>
+                        </div>
+                        <div className="col-span-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+                              <SessionIcon size={11} className="text-mint-500" />
+                              {booking.sessionType}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+                              <DeliveryIcon size={11} className="text-mint-500" />
+                              {booking.deliveryMode}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-sm text-gray-700 font-medium">
+                            {booking.preferredDate}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {booking.preferredTimeSlot}
+                          </p>
+                        </div>
+                        <div className="col-span-1">
+                          <StatusBadge status={booking.status} />
+                        </div>
+                        <div className="col-span-1 flex justify-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookingClick(booking);
+                            }}
+                            className="p-2 rounded-lg text-gray-400 hover:text-mint-500 hover:bg-mint-50 transition-all duration-300"
+                          >
+                            <Eye size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-xs text-gray-500 order-2 sm:order-1">
+                  Showing{" "}
+                  <span className="font-medium text-gray-700">
+                    {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium text-gray-700">
+                    {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-gray-700">
+                    {filtered.length}
+                  </span>{" "}
+                  bookings
+                </p>
+                <div className="flex items-center gap-2 order-1 sm:order-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 disabled:opacity-30 hover:bg-white hover:border-mint-300 transition-all duration-300"
+                  >
+                    <ChevronLeft size={15} className="text-gray-600" />
+                  </button>
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum = currentPage;
+                      if (totalPages <= 5) pageNum = i + 1;
+                      else if (currentPage <= 3) pageNum = i + 1;
+                      else if (currentPage >= totalPages - 2)
+                        pageNum = totalPages - 4 + i;
+                      else pageNum = currentPage - 2 + i;
+
+                      if (pageNum > totalPages) return null;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+                            currentPage === pageNum
+                              ? "bg-mint-500 text-white shadow-sm"
+                              : "text-gray-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 disabled:opacity-30 hover:bg-white hover:border-mint-300 transition-all duration-300"
+                  >
+                    <ChevronRight size={15} className="text-gray-600" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Detail Modal */}
+        {isModalOpen && selectedBooking && (
+          <DetailModal
+            booking={selectedBooking}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedBooking(null);
+            }}
+            onUpdateStatus={updateStatus}
+            onDelete={deleteBooking}
+            updating={updating}
+          />
+        )}
+      </div>
+    );
+  }
+
+
+
+category
+title
+sub title
+readTime
+
+
+content
+
+also add opion tha can make add a number or bullet point for numbering
+then also have a option to add another section 
+
+which will have a title and the content
+

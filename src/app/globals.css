@@ -8,6 +8,10 @@
 * {
   scrollbar-width: none;
 }
+.about {
+  background-image: url("/cta.png");
+  object-fit: cover;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -15,6 +19,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-mint: #8e9867;
+  --color-brown: #8d6959;
   --color-mintl: #6d754d;
 }
 
@@ -50,4 +55,9 @@ body {
 
 .animation-delay-1000 {
   animation-delay: 1s;
+}
+
+.section {
+  position: sticky;
+  top: 0;
 }

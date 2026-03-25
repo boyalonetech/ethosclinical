@@ -1,8 +1,7 @@
-
 export const NAV_LINKS = [
   {
     name: "Home",
-    link: "",
+    link: "/",
   },
   {
     name: "About",

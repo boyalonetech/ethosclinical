@@ -1,0 +1,527 @@
+make this code when it is clicked
+
+"use client";
+import { BLOG_POST, CATEGORIES, CATEGORY_COLORS } from "@/app/data/blog";
+import { ArrowRight, Calendar, ChevronRight, Clock, Tag } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+// import { useEffect, useState } from "react";
+
+// Infer the type from the imported data
+type BlogPost = (typeof BLOG_POST)[number];
+type Category = (typeof CATEGORIES)[number];
+
+// No need to redeclare variables - use imported directly
+export function AllPosts() {
+  // const [active, setActive] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleMore = () => {
+    if (pathname === "/blog") {
+      alert("I am in Blog page");
+    } else {
+      router.push("/blog");
+    }
+  };
+
+  return (
+    <section className="py-14 px-3 lg:px-10 bg-gradient-to-b from-stone-50 to-white">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+        {/* Category filter tabs */}
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+          {BLOG_POST.map(
+            (
+              { category, title, excerpt, date, readTime, image }: BlogPost,
+              i: number,
+            ) => (
+              <article
+                key={i}
+                className="group relative rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 h-[370px]"
+              >
+                {/* Background Image with Overlay */}
+                <div className="absolute inset-0">
+                  <picture>
+                    {" "}
+                    <img
+                      src={image}
+                      alt={title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    />
+                  </picture>
+                  {/* Gradient overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent group-hover:from-black/80 group-hover:via-black/40 transition-all duration-500" />
+                </div>
+
+                {/* Content Container */}
+                <div className="relative h-full flex flex-col justify-end p-5">
+                  {/* Title - Smaller font */}
+                  <h3
+                    className="text-sm sm:text-base font-normal text-white leading-tight mb-1.5 transition-colors line-clamp-2"
+                    style={{ fontFamily: "'Bona Nova', serif" }}
+                  >
+                    {title}
+                  </h3>
+
+                  {/* Excerpt - Smaller text, fewer lines */}
+                  <p className="text-white/70 text-[11px] sm:text-xs leading-relaxed mb-3 line-clamp-2">
+                    {excerpt}
+                  </p>
+
+                  {/* Meta and Action - Compact */}
+                  <div className="pt-2 border-t border-white/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs">
+                      <span className="flex items-center gap-1">
+                        <Calendar size={10} />
+                        {date}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock size={10} />
+                        {readTime}
+                      </span>
+                    </div>
+                    <a
+                      href="#"
+                      className="text-white hover:text-mint transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-sm p-1.5 rounded-full"
+                      aria-label="Read article"
+                    >
+                      <ArrowRight size={12} />
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ),
+          )}
+        </div>
+
+        {/* Load more */}
+        {BLOG_POST.length > 3 && (
+          <div className="flex justify-center pt-4">
+            <button
+              className="bg-white hover:bg-stone-50 text-mintl border border-stone-300 hover:border-mint text-sm font-medium px-7 py-3.5 rounded-xl transition-colors flex items-center gap-2 shadow-sm hover:shadow-md"
+              onClick={handleMore}
+            >
+              Load More Articles <ChevronRight size={15} />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+
+this blog full page code will appear using is code styling
+
+
+import React from 'react';
+import Image from 'next/image';
+import { 
+  Menu, 
+  X, 
+  Facebook, 
+  Twitter, 
+  Instagram, 
+  Linkedin,
+  ChevronRight,
+  Mail,
+  Send,
+  BookOpen,
+  Heart,
+  Shield,
+  Users
+} from 'lucide-react';
+
+const HomePage: React.FC = () => {
+  return (
+    <div className="w-full min-h-screen bg-white overflow-x-hidden">
+      {/* Main Content */}
+      <div className="bg-stone-50 overflow-hidden">
+        {/* Navigation */}
+        <nav className="w-full px-16 py-5 bg-stone-50 flex justify-between items-center sticky top-0 z-50">
+          <div className="relative w-36 h-14">
+            <Image
+              src="https://placehold.co/140x58"
+              alt="Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+          
+          <div className="w-[860px] flex justify-between items-center">
+            <div className="flex justify-start items-center gap-12">
+              {['Home', 'About', 'Contact', 'Blog'].map((item, index) => (
+                <button
+                  key={item}
+                  className={`px-2.5 py-[5px] transition-colors duration-200 hover:text-stone-600 ${
+                    index === 3 ? 'text-stone-500' : 'text-black'
+                  }`}
+                >
+                  <span className="text-lg font-medium font-['Geist'] leading-5 tracking-tight">
+                    {item}
+                  </span>
+                </button>
+              ))}
+            </div>
+            
+            <button className="px-5 py-3.5 bg-stone-500 rounded-[5px] hover:bg-stone-600 transition-colors duration-200 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-white" />
+              <span className="text-white text-lg font-medium font-['Geist'] leading-5 tracking-tight">
+                Book a Counsellor
+              </span>
+            </button>
+          </div>
+        </nav>
+
+        {/* Hero Image */}
+        <div className="relative w-full max-w-[1000px] mx-auto mt-[165px]">
+          <div className="relative aspect-[1000/643] rounded-[20px] overflow-hidden">
+            <Image
+              src="https://placehold.co/1000x643"
+              alt="Hero"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Article Content */}
+        <article className="max-w-[968px] mx-auto px-4 mt-[70px]">
+          <h1 className="text-stone-500 text-4xl font-normal font-['Geist'] leading-10 text-center mb-6">
+            The Hidden Cost of Moral Injury: Why Your Best Staff Are Burning Out
+          </h1>
+          
+          <p className="text-black text-2xl font-normal font-['Geist'] leading-8 text-center mb-8">
+            It's not their caseload. It's not lack of skill. Here's what's actually happening. You've probably noticed it. Maybe you're living it.
+          </p>
+          
+          <div className="space-y-6">
+            <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+              A skilled, thoughtful therapeutic specialist who's been with your organisation for three, four, five years suddenly puts in their resignation. They give the official reason, better opportunity, career change, wanting to step back, but the real conversation happens offline. "I couldn't keep doing it. Every day I was being asked to work within processes I don't believe in. Every day I was making decisions I knew weren't in my clients' best interests, but they're what the system allows."
+            </p>
+            
+            <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+              Their replacement takes eight months to settle. They still don't know the family histories, the nuances, the institutional knowledge that makes genuine therapeutic work possible. Your clients lose continuity. The remaining team carries the extra weight. And the cycle starts again. We call this burnout. But that word misses something crucial.
+            </p>
+            
+            <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+              What's actually happening is moral injury.
+            </p>
+            
+            <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+              Let's be specific about the difference.
+            </h2>
+            
+            <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+              Burnout is exhaustion. It's when caseloads are too high, you're working too many hours, and your nervous system is fried. It's real, and it matters.<br/>
+              But moral injury is something quieter and more dangerous. It's the psychological wound that happens when you're doing work that fundamentally contradicts your values. When you're asked day after day to follow processes you don't believe in. When you have to make decisions you know aren't right for your clients, but they're what the system allows.
+            </p>
+            
+            {/* Lists with icons */}
+            <div className="mt-8 space-y-6">
+              <div>
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mb-4">
+                  A therapist working in out-of-home care might feel moral injury when:
+                </p>
+                <ul className="space-y-2.5">
+                  {[
+                    "A child who desperately needs therapeutic support doesn't qualify for NDIS funding",
+                    "You're required to end a therapeutic relationship because the care arrangement changed, even though the relationship was just becoming safe",
+                    "You're managing a caseload so large you can't actually know your clients—you're administrating care instead of practicing therapy",
+                    "You're expected to work within a 'placement first' logic that contradicts your clinical judgment about what a traumatised child actually needs"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <ChevronRight className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                      <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mb-4">
+                  A support coordinator in NDIS might feel moral injury when:
+                </p>
+                <ul className="space-y-2.5">
+                  {[
+                    "Participant goals written into plans don't actually reflect what that person wants, they reflect what the system can fund",
+                    "You're caught between your client's needs and budget constraints, and you have to be the bearer of bad news",
+                    "You see people with extraordinary potential getting the bare minimum, not because of lack of skill, but because of a spreadsheet"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <ChevronRight className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                      <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mb-4">
+                  A trauma counsellor might feel moral injury when:
+                </p>
+                <ul className="space-y-2.5">
+                  {[
+                    "You're told to use a manualised approach when you know your particular client needs something different",
+                    "You're working in a system that treats complex trauma like a diagnosis to be fixed, not a relational wound to be healed",
+                    "You're holding clients' pain every day without space to actually process what that does to you"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <ChevronRight className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                      <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                  Here's the clinical reality:
+                </p>
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                  When moral injury goes unaddressed, it doesn't just feel bad. It literally changes how your brain works.<br/>
+                  Research in trauma and moral injury shows that prolonged ethical violation creates a state of cognitive dissonance, you're holding two contradictory truths simultaneously: "I believe in this work" and "This system is harming people." Your nervous system can't resolve that contradiction, so it stays activated. Hypervigilant. On high alert.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mb-4">
+                  That hypervigilance shows up as:
+                </p>
+                <ul className="space-y-2.5">
+                  {[
+                    "Decision fatigue that no amount of sleep fixes",
+                    "Cynicism about your work (even though you know you care)",
+                    "Difficulty being present with clients (your nervous system is too busy scanning for the next ethical violation)",
+                    "Disconnection from your clinical judgment",
+                    "Increasing emotional numbness (your brain protecting itself)",
+                    "The quiet certainty that you don't belong in this sector anymore"
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <Shield className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                      <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mt-6">
+                And here's the thing: This isn't a personality problem. This isn't "you're not resilient enough." This is a systemic integrity problem that lands in individual nervous systems.
+              </p>
+
+              <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+                So what actually helps?
+              </h2>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                Most supervision models don't touch moral injury. They're designed to address skill deficits, case management, and compliance. Which is important. But it's not what you actually need when you're struggling with the ethical weight of complex work.<br/>
+                What helps is space, real protected space to examine the ethical "stuck points" without judgment.
+              </p>
+
+              <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+                Space to ask:
+              </h2>
+
+              <ul className="space-y-3">
+                {[
+                  "Where does my responsibility actually end?",
+                  "What is the 'good' I'm trying to serve in a broken system?",
+                  "Am I experiencing moral injury by following a process I don't believe in?",
+                  "What would ethical practice look like within these constraints?",
+                  "How do I honour both my values and the reality of the system?"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <Heart className="w-4 h-4 text-stone-500 mt-1 flex-shrink-0" />
+                    <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mt-4">
+                These aren't rhetorical questions. They're clinical work. And when you have space to examine them, with a supervisor who understands both the clinical complexity and the ethical terrain, something shifts.
+              </p>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                You don't suddenly love the broken system. But you do:
+              </p>
+
+              <ul className="space-y-2">
+                {[
+                  "Regain clarity about what's in your control and what isn't",
+                  "Reconnect with your clinical judgment",
+                  "Develop strategies for working ethically within constraints",
+                  "Stop blaming yourself for systemic failures",
+                  "Feel like you belong in this work again"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <ChevronRight className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                    <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+                The cost of not doing this work:
+              </h2>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                Organisations lose their best people. Not because they weren't capable. But because the cognitive dissonance between their values and the system was unsustainable.<br/>
+                And you know what that costs? Not just the recruitment and training of replacements. It's institutional knowledge walking out the door. It's clients losing therapeutic continuity. It's remaining staff carrying the weight of grief and extra caseload.<br/>
+                It's the beginning of a cascade that's expensive to recover from.
+              </p>
+
+              <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+                What would be different?
+              </h2>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                Imagine your team having regular space, maybe monthly, to examine the ethical weight of their work. Not to complain about the system (though that happens). But to:
+              </p>
+
+              <ul className="space-y-2.5">
+                {[
+                  "Process the moral complexity they're holding",
+                  "Reconnect with their clinical judgment",
+                  "Develop sustainable strategies for ethical practice",
+                  "Know they're not alone in struggling with these questions",
+                  "Feel seen and held by someone who understands",
+                  "That's clinical supervision that actually prevents moral injury."
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-stone-500 mt-1 flex-shrink-0" />
+                    <span className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <h2 className="text-stone-500 text-2xl font-normal font-['Geist'] leading-8 mt-8">
+                A final thought:
+              </h2>
+
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide">
+                Your best people aren't leaving because they lack skill. They're leaving because nobody's making space for the ethical and existential questions that are actually keeping them up at night.<br/>
+                If you want to keep them? Make that space.
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      {/* CTA Banner */}
+      <div className="w-full bg-white py-[90px]">
+        <div className="max-w-[1300px] mx-auto px-4 relative bg-stone-800 rounded-[20px] overflow-hidden min-h-[566px] flex flex-col items-center justify-center">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-[50px] right-[50px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute top-[97px] right-[50px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute top-[97px] right-[92px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute top-[50px] right-[92px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute bottom-[119px] left-[50px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute bottom-[72px] left-[50px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute bottom-[72px] left-[92px] w-5 h-5 bg-white rounded-full" />
+            <div className="absolute bottom-[119px] left-[92px] w-5 h-5 bg-white rounded-full" />
+          </div>
+          
+          <div className="text-center relative z-10">
+            <h2 className="text-white text-3xl font-normal font-['Bona_Nova'] leading-10 tracking-tight mb-6">
+              Ethos Clinical Supervision
+            </h2>
+            <p className="text-stone-50 text-4xl font-normal font-['Geist'] leading-10 max-w-[891px] mx-auto mb-8">
+              An organisation built on a strong commitment to supporting people.
+            </p>
+            <button className="px-5 py-3.5 bg-stone-500 rounded-[5px] hover:bg-stone-600 transition-colors duration-200 inline-flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-white" />
+              <span className="text-white text-lg font-medium font-['Geist'] leading-5 tracking-tight">
+                Book a Counsellor
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="w-full bg-yellow-50 py-[70px]">
+        <div className="max-w-[1440px] mx-auto px-[70px]">
+          <div className="flex flex-wrap justify-between gap-12">
+            <div className="max-w-[384px]">
+              <div className="relative w-32 h-14 mb-8">
+                <Image
+                  src="https://placehold.co/135x56"
+                  alt="Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <p className="text-black text-base font-normal font-['Geist'] leading-6 tracking-wide mb-8">
+                A supportive space to reflect, grow, and feel understood offering compassionate, personalised mental health support to navigate life's challenges.
+              </p>
+              <div className="flex gap-3">
+                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, idx) => (
+                  <button
+                    key={idx}
+                    className="w-10 h-10 bg-stone-500 rounded-md hover:bg-stone-600 transition-colors duration-200 flex items-center justify-center"
+                  >
+                    <Icon className="w-5 h-5 text-white" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <ul className="space-y-6">
+                {['About Us', 'Contact Us', 'Bookings', 'Blogs', 'Services'].map((item) => (
+                  <li key={item}>
+                    <button className="text-black text-lg font-medium font-['Geist'] leading-5 tracking-tight hover:text-stone-600 transition-colors duration-200">
+                      {item}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="max-w-[384px]">
+              <h3 className="text-black text-2xl font-normal font-['Geist'] leading-8 mb-4">
+                Stay Updated
+              </h3>
+              <p className="text-black text-lg font-medium font-['Geist'] leading-5 tracking-tight mb-6">
+                Subscribe to our newsletter for the latest podcast updates, news, and exclusive offers.
+              </p>
+              <div className="flex gap-2">
+                <div className="flex-1 px-5 py-3.5 bg-white rounded-[10px] flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="Enter your Email"
+                    className="flex-1 outline-none text-black text-lg font-medium font-['Geist'] leading-5 tracking-tight placeholder:text-gray-400"
+                  />
+                </div>
+                <button className="px-5 py-3.5 bg-stone-500 rounded-[5px] hover:bg-stone-600 transition-colors duration-200 flex items-center gap-2">
+                  <Send className="w-5 h-5 text-white" />
+                  <span className="text-white text-lg font-medium font-['Geist'] leading-5 tracking-tight">
+                    Submit
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default HomePage;

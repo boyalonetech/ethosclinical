@@ -14,7 +14,7 @@ export default function Sidebar({ onPageChange, activePage }: SidebarProps) {
   // mode = "bookings"
 
   return (
-    <aside className="w-66 h-screen fixed left-0 border bg-mint">
+    <aside className=" w-55 xl:w-66 h-screen fixed left-0 border bg-mint">
       <h1 className="text-left font-bold text-4xl p-4">Admin</h1>
 
       <div className="flex flex-col gap-4">

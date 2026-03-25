@@ -3,7 +3,7 @@ export default function MeetStephen() {
     <section className="bg-stone-50 pt-16 pb-12 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold text-stone-900 text-center leading-tight max-w-3xl mx-auto mb-12">
+        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-semibold font-[Geist] text-stone-900 text-center leading-tight max-w-3xl mx-auto mb-12">
           Finding balance and peace of mind.
         </h1>
 
@@ -12,7 +12,7 @@ export default function MeetStephen() {
           <picture>
             {" "}
             <img
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=1000&q=80"
+              src="/about.jpg"
               alt="Stephen Onyekwere"
               className="w-full h-full object-cover"
             />

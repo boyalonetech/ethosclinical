@@ -2,10 +2,9 @@
 
 import { Search } from "lucide-react";
 import { STATS } from "../data/blog";
-import FeaturedPost from "@/components/Blog/NewPost";
 import CTABanner from "@/components/Home/CTA";
 import Footer from "@/components/Home/Footer";
-import { AllPosts } from "@/components/Blog/AllPost";
+import BlogPage from "@/components/Blog/AllPost";
 
 /* ─────────────────────────────────────────────
    BLOG HERO
@@ -52,10 +51,10 @@ function StatsStrip() {
   return (
     <section className="bg-mint py-8 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-        {STATS.map(({ icon: Icon, value, label }) => (
+        {STATS.map(({ value, label }) => (
           <div key={label} className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-mint flex items-center justify-center shrink-0">
-              <Icon size={18} className="text-white" />
+              {/* <Icon size={18} className="text-white" /> */}
             </div>
             <div>
               <p className="text-white text-xl font-semibold leading-none">
@@ -82,8 +81,7 @@ export default function EthosBlogPage() {
     <main className="min-h-screen font-['Geist',sans-serif]">
       <BlogHero />
       <StatsStrip />
-      <FeaturedPost />
-      <AllPosts />
+      <BlogPage />
       <CTABanner />
       <Footer />
     </main>
