@@ -1,6 +1,6 @@
 // app/create/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Plus,
@@ -47,7 +47,8 @@ interface ContentData {
   [key: string]: unknown;
 }
 
-export default function CreatePostPage() {
+// Component that uses useSearchParams
+function CreatePostContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
@@ -339,6 +340,7 @@ export default function CreatePostPage() {
         {formData.image && (
           <div className="relative mb-8 rounded-xl overflow-hidden bg-gray-100">
             <picture>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={formData.image}
                 alt={formData.title}
@@ -466,7 +468,7 @@ export default function CreatePostPage() {
   }
 
   return (
-    <div className="min-h-screen  bg-white">
+    <div className="min-h-screen bg-white">
       {/* Top Bar */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -763,5 +765,26 @@ export default function CreatePostPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Main export with Suspense boundary
+export default function CreatePostPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <Loader2
+              size={48}
+              className="animate-spin text-[#8e9867] mx-auto mb-4"
+            />
+            <p className="text-gray-500">Loading editor...</p>
+          </div>
+        </div>
+      }
+    >
+      <CreatePostContent />
+    </Suspense>
   );
 }
