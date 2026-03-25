@@ -3,7 +3,7 @@ import { getPosts, PostRecord } from "@/backend/server";
 
 export interface Section {
   id: string;
-  type: 'paragraph' | 'heading' | 'bulletList' | 'numberedList';
+  type: "paragraph" | "heading" | "bulletList" | "numberedList";
   title?: string;
   content: string;
   items?: string[];
@@ -26,7 +26,7 @@ export interface BlogPost {
 
 // Define the structure of content from database
 interface DatabaseContent {
-  type?: 'paragraph' | 'heading' | 'bulletList' | 'numberedList';
+  type?: "paragraph" | "heading" | "bulletList" | "numberedList";
   title?: string;
   content?: string;
   items?: string[];
@@ -34,17 +34,19 @@ interface DatabaseContent {
 }
 
 // Helper function to convert database content to sections
-const convertDatabaseContentToSections = (contentArray: DatabaseContent[]): Section[] => {
+const convertDatabaseContentToSections = (
+  contentArray: DatabaseContent[],
+): Section[] => {
   if (!contentArray || !Array.isArray(contentArray)) {
     return [];
   }
 
   return contentArray.map((item, index) => ({
     id: `section-${Date.now()}-${index}`,
-    type: item.type || 'paragraph',
-    content: item.content || '',
+    type: item.type || "paragraph",
+    content: item.content || "",
     title: item.title || undefined,
-    items: item.items || undefined
+    items: item.items || undefined,
   }));
 };
 
@@ -53,57 +55,75 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
     const records = await getPosts();
     console.log("Raw records from database:", records); // Debug: See raw data
-    
+
     const formattedPosts: BlogPost[] = records.map((record: PostRecord) => {
       let sections: Section[] = [];
-      
+
       // Handle different content structures
       if (record.content) {
         try {
           // Try to parse if it's a string
-          const parsedContent: DatabaseContent | DatabaseContent[] | string = 
-            typeof record.content === 'string' 
-              ? JSON.parse(record.content) 
+          const parsedContent: DatabaseContent | DatabaseContent[] | string =
+            typeof record.content === "string"
+              ? JSON.parse(record.content)
               : record.content;
-          
+
           // Check if it's an array (your database structure)
           if (Array.isArray(parsedContent)) {
             sections = convertDatabaseContentToSections(parsedContent);
-          } 
+          }
           // Check if it's an object with sections property
-          else if (typeof parsedContent === 'object' && parsedContent !== null && 'sections' in parsedContent && Array.isArray(parsedContent.sections)) {
+          else if (
+            typeof parsedContent === "object" &&
+            parsedContent !== null &&
+            "sections" in parsedContent &&
+            Array.isArray(parsedContent.sections)
+          ) {
             sections = parsedContent.sections;
           }
           // If it's a single object with type and content
-          else if (typeof parsedContent === 'object' && parsedContent !== null && 'type' in parsedContent && 'content' in parsedContent) {
-            sections = convertDatabaseContentToSections([parsedContent as DatabaseContent]);
+          else if (
+            typeof parsedContent === "object" &&
+            parsedContent !== null &&
+            "type" in parsedContent &&
+            "content" in parsedContent
+          ) {
+            sections = convertDatabaseContentToSections([
+              parsedContent as DatabaseContent,
+            ]);
           }
           // If it's a plain string
-          else if (typeof parsedContent === 'string') {
-            sections = [{
-              id: `section-${Date.now()}`,
-              type: 'paragraph',
-              content: parsedContent
-            }];
+          else if (typeof parsedContent === "string") {
+            sections = [
+              {
+                id: `section-${Date.now()}`,
+                type: "paragraph",
+                content: parsedContent,
+              },
+            ];
           }
         } catch (e) {
           console.error("Error parsing content for post", record.id, e);
           // If parsing fails, treat as plain text
-          sections = [{
-            id: `section-${Date.now()}`,
-            type: 'paragraph',
-            content: String(record.content)
-          }];
+          sections = [
+            {
+              id: `section-${Date.now()}`,
+              type: "paragraph",
+              content: String(record.content),
+            },
+          ];
         }
       }
 
       // If no sections were created, create a default one from excerpt
       if (sections.length === 0 && record.excerpt) {
-        sections = [{
-          id: `section-${Date.now()}`,
-          type: 'paragraph',
-          content: record.excerpt
-        }];
+        sections = [
+          {
+            id: `section-${Date.now()}`,
+            type: "paragraph",
+            content: record.excerpt,
+          },
+        ];
       }
 
       return {
@@ -112,17 +132,19 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
         title: record.title || "Untitled",
         subtitle: record.subtitle || "",
         excerpt: record.excerpt || "",
-        date: record.date || new Date(record.created).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }),
+        date:
+          record.date ||
+          new Date(record.created).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
         readTime: record.readTime || "5 min read",
         image: record.image || "https://placehold.co/1200x800?text=Blog+Image",
         author: record.author || "Anonymous",
         sections: sections,
         created: record.created,
-        updated: record.updated
+        updated: record.updated,
       };
     });
 
@@ -154,16 +176,16 @@ export const CATEGORY_COLORS: Record<string, string> = {
   "Self-Care": "bg-mint text-white",
   "Trauma-Informed Care": "bg-mint text-white",
   "Ethical Practice": "bg-mint text-white",
-  "Supervision": "bg-mint text-white",
+  Supervision: "bg-mint text-white",
   "Mental Health": "bg-mint text-white",
   "Professional Development": "bg-mint text-white",
-  "Uncategorized": "bg-mint text-white",
+  Uncategorized: "bg-mint text-white",
 };
 
 // Stats for the blog page
 export const STATS = [
-  { icon: "BookOpen", value: "0", label: "Articles Published" },
-  { icon: "Users", value: "0", label: "Practitioners Supported" },
-  { icon: "Heart", value: "0", label: "Specialist Topics" },
-  { icon: "TrendingUp", value: "0", label: "Years of Practice" },
+  { icon: "BookOpen", value: "10", label: "Articles Published" },
+  { icon: "Users", value: "25", label: "Practitioners Supported" },
+  { icon: "Heart", value: "12", label: "Specialist Topics" },
+  { icon: "TrendingUp", value: "30", label: "Years of Practice" },
 ];
