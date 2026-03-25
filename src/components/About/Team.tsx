@@ -1,9 +1,27 @@
 export default function Team() {
-  const avatarImages = [
-    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=70",
-    "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?w=400&q=70",
-    "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&q=70",
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=70",
+  const avatarImages = ["/team.jpg", "/team1.jpg", "/team2.jpg", "/team3.jpg"];
+
+  const teamMembers = [
+    {
+      name: "James Wilson",
+      role: "Clinical Director",
+      quote: "Every mind deserves compassionate care.",
+    },
+    {
+      name: "Michael Chen",
+      role: "Lead Therapist",
+      quote: "Healing happens in safe spaces.",
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Wellness Coach",
+      quote: "Small steps lead to big changes.",
+    },
+    {
+      name: "David Kim",
+      role: "Mental Health Advocate",
+      quote: "Your story matters, and so does your voice.",
+    },
   ];
 
   return (
@@ -13,37 +31,35 @@ export default function Team() {
           The team that makes things happen.
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-          {[0, 1].map((i) => (
-            <div
-              key={i}
-              className="rounded-xl overflow-hidden bg-stone-200 aspect-[3/4]"
-            >
-              <picture>
-                <img
-                  src={avatarImages[i]}
-                  alt={`Team member ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </picture>
-            </div>
-          ))}
+        {/* Mobile: horizontal scroll, Desktop: grid */}
+        <div className="overflow-x-auto lg:overflow-visible">
+          <div className="flex lg:grid lg:grid-cols-4 xl:grid-cols-4 gap-6 items-start w-max lg:w-full">
+            {teamMembers.map((member, index) => (
+              <div
+                key={index}
+                className="group relative rounded-xl overflow-hidden bg-stone-200 aspect-[3/4] cursor-pointer w-[280px] sm:w-[320px] lg:w-auto flex-shrink-0"
+              >
+                {/* Image - visible in normal state */}
+                <picture className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-0">
+                  <img
+                    src={avatarImages[index % avatarImages.length]}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
+                </picture>
 
-          {/* Quote card */}
-          <div className="rounded-xl bg-stone-100 flex  items-center justify-center aspect-[3/4] px-6">
-            <p className="text-stone-800 text-xl font-normal text-center leading-snug">
-              &quot;Mental health is a journey, not a final destination.&quot;
-            </p>
-          </div>
-
-          <div className="rounded-xl overflow-hidden bg-stone-200 aspect-[3/4]">
-            <picture>
-              <img
-                src={avatarImages[2]}
-                alt="Team member 4"
-                className="w-full h-full object-cover"
-              />
-            </picture>
+                {/* Text overlay - visible on hover */}
+                <div className="absolute inset-0 bg-white shadow-llg border flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                  <h3 className="text-black text-2xl font-semibold mb-2 font-['Bona_Nova',serif]">
+                    {member.name}
+                  </h3>
+                  <p className="text-black/70 text-sm mb-4">{member.role}</p>
+                  <p className="text-black text-base leading-relaxed">
+                    &apos;{member.quote}&apos;
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

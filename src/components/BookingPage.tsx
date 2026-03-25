@@ -140,7 +140,9 @@ export default function BookingForm() {
     } catch (err: unknown) {
       console.error("Error creating booking:", err);
       setError(
-        err instanceof Error ? err.message : "Failed to submit booking. Please try again.",
+        err instanceof Error
+          ? err.message
+          : "Failed to submit booking. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -167,16 +169,16 @@ export default function BookingForm() {
 
   return (
     <>
-      <section className="py-14 px-6 lg:px-10 bg-white">
+      <section className="py-14 px-0 lg:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           {/* Header row with eye icon */}
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
+            <div className="flex px-6 lg:px-0  items-center gap-2">
               <div
                 className="w-1 h-5 rounded-full"
                 style={{ backgroundColor: ACCENT }}
               />
-              <p className="text-sm font-semibold uppercase tracking-widest text-gray-600">
+              <p className="text-sm  font-semibold uppercase tracking-widest text-gray-600">
                 Book Your Session
               </p>
             </div>
@@ -205,7 +207,7 @@ export default function BookingForm() {
             {/* ── LEFT SIDEBAR ── */}
             <div className="flex flex-col gap-6">
               {/* Session type */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+              <div className="bg-white lg:rounded-2xl lg:border border-gray-200 p-6 flex flex-col gap-4">
                 <h3 className="font-semibold text-base text-black">
                   Session Type
                 </h3>
@@ -267,7 +269,7 @@ export default function BookingForm() {
               </div>
 
               {/* Delivery mode */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+              <div className="bg-white rounded-2xl lg:border border-gray-200 p-6 flex flex-col gap-4">
                 <h3 className="font-semibold text-base text-black">
                   Delivery Mode
                 </h3>
@@ -297,7 +299,7 @@ export default function BookingForm() {
               </div>
 
               {/* Contact info */}
-              <div className="bg-white shadow rounded-2xl p-6 flex flex-col gap-4">
+              <div className="bg-white lg:shadow lg:rounded-2xl p-6 flex flex-col gap-4">
                 <p className="text-gray-900 text-xs uppercase tracking-widest font-medium">
                   Need help?
                 </p>
@@ -317,7 +319,7 @@ export default function BookingForm() {
                     <a
                       key={value}
                       href={href}
-                      className="flex items-center gap-3 text-gray-700 text-sm hover:text-white transition-colors"
+                      className="flex items-center gap-3 text-gray-700 text-sm hover:text-mint transition-colors"
                     >
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
@@ -335,7 +337,7 @@ export default function BookingForm() {
             {/* ── MAIN FORM ── */}
             <div className="lg:col-span-2 flex flex-col gap-6">
               {/* Date & Time */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-5">
+              <div className="bg-white lg:rounded-2xl lg:border border-gray-200 p-6 flex flex-col gap-5">
                 <h3 className="font-semibold text-base flex items-center gap-2 text-black">
                   <Calendar size={16} className="text-gray-500" /> Preferred
                   Date & Time
@@ -394,7 +396,7 @@ export default function BookingForm() {
               </div>
 
               {/* Personal details */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-5">
+              <div className="bg-white lg:rounded-2xl lg:border border-gray-200 p-6 flex flex-col gap-5">
                 <h3 className="font-semibold text-base flex items-center gap-2 text-black">
                   <User size={16} className="text-gray-500" /> Your Details
                 </h3>

@@ -26,18 +26,21 @@ export const TESTIMONIALS = [
       "Ethos Clinical Supervision brought depth and structure to our team's reflective practice. Our staff feel more supported, and the quality of clinical discussion has significantly improved.",
     name: "David Thompson",
     role: "Program Manager, Northbridge Family Services",
+    color: "bg-mint text-white rotate-15",
   },
   {
     quote:
       "Stephen creates a space where you can genuinely think through the ethical and emotional complexities of the work. It's supervision that actually supports you as a practitioner.",
     name: "Leanne Carter",
     role: "Therapeutic Practitioner, Trauma Services",
+    color: "bg-brown text-white -rotate-20 mx-3",
   },
   {
     quote:
       "Working with Ethos has helped our team move beyond compliance-based supervision toward meaningful reflection. The impact on staff wellbeing and retention has been noticeable.",
     name: "Riverdale Community Support Centre",
     role: "Organisation Partner",
+    color: "bg-mint text-white rotate-25 ml-6",
   },
 ];
 
@@ -71,5 +74,3 @@ export const ETHOS_COMMITMENTS = [
     desc: "Stronger practitioner retention, improved ethical decision-making, supported teams, and better continuity of care for clients.",
   },
 ];
-
-

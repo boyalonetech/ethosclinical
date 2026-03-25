@@ -25,31 +25,32 @@ export default function FAQ() {
           {FAQS.map((question, i) => {
             const isOpen = openIndex === i;
             return (
-              <button
-                key={i}
-                onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="w-full bg-white rounded-xl px-5 py-5 flex items-start justify-between gap-4 text-left hover:bg-stone-50 transition-colors border border-stone-100 hover:border-stone-200"
-              >
-                <span className="text-gray-600 text-base font-normal leading-snug flex-1">
-                  {question}
-                </span>
-                <span className="w-8 h-8 rounded-full bg-mint flex items-center justify-center shrink-0 mt-0.5">
-                  {isOpen ? (
-                    <Minus size={14} className="text-white" />
-                  ) : (
-                    <Plus size={14} className="text-white" />
-                  )}
-                </span>
-              </button>
+              <div key={i} className="flex flex-col gap-2">
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  className="w-full bg-white rounded-xl px-5 py-5 flex items-start justify-between gap-4 text-left hover:bg-stone-50 transition-colors border border-stone-100 hover:border-stone-200"
+                >
+                  <span className="text-gray-600 text-base font-normal leading-snug flex-1">
+                    {question}
+                  </span>
+                  <span className="w-8 h-8 rounded-full bg-brown flex items-center justify-center shrink-0 mt-0.5">
+                    {isOpen ? (
+                      <Minus size={14} className="text-white" />
+                    ) : (
+                      <Plus size={14} className="text-white" />
+                    )}
+                  </span>
+                </button>
+
+                {/* Answer panel directly below this question */}
+                {isOpen && (
+                  <div className="bg-stone-100 rounded-xl px-5 py-4 text-gray-600 text-sm leading-relaxed border border-stone-200">
+                    {ANSWERS[i]}
+                  </div>
+                )}
+              </div>
             );
           })}
-
-          {/* Expanded answer panel */}
-          {openIndex !== null && (
-            <div className="bg-stone-100 rounded-xl px-5 py-4 text-gray-600 text-sm leading-relaxed -mt-1 border border-stone-200">
-              {ANSWERS[openIndex]}
-            </div>
-          )}
         </div>
       </div>
     </section>

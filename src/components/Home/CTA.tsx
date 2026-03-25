@@ -39,7 +39,7 @@ export default function CTABanner() {
             <h2 className="text-white text-3xl sm:text-4xl font-normal max-w-2xl mx-auto leading-snug mb-8 font-['Geist',sans-serif]">
               An organisation built on a strong commitment to supporting people.
             </h2>
-            <button className="bg-mint hover:bg-stone-400 text-white text-sm font-medium px-6 py-3.5 rounded-md transition-colors inline-flex items-center gap-2">
+            <button className="bg-mint hover:bg-brown text-white text-sm font-medium px-6 py-3.5 rounded-md transition-colors inline-flex items-center gap-2">
               Book a Counsellor <ArrowRight size={16} />
             </button>
           </div>

@@ -149,15 +149,15 @@ export const CATEGORIES = [
 
 // Category colors for UI
 export const CATEGORY_COLORS: Record<string, string> = {
-  "Moral Injury": "bg-amber-500/80 text-white",
-  "Clinical Supervision": "bg-blue-500/80 text-white",
-  "Self-Care": "bg-green-500/80 text-white",
-  "Trauma-Informed Care": "bg-purple-500/80 text-white",
-  "Ethical Practice": "bg-indigo-500/80 text-white",
-  "Supervision": "bg-pink-500/80 text-white",
-  "Mental Health": "bg-teal-500/80 text-white",
-  "Professional Development": "bg-orange-500/80 text-white",
-  "Uncategorized": "bg-gray-500/80 text-white",
+  "Moral Injury": "bg-mint text-white",
+  "Clinical Supervision": "bg-mint text-white",
+  "Self-Care": "bg-mint text-white",
+  "Trauma-Informed Care": "bg-mint text-white",
+  "Ethical Practice": "bg-mint text-white",
+  "Supervision": "bg-mint text-white",
+  "Mental Health": "bg-mint text-white",
+  "Professional Development": "bg-mint text-white",
+  "Uncategorized": "bg-mint text-white",
 };
 
 // Stats for the blog page

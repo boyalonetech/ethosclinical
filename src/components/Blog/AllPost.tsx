@@ -116,9 +116,9 @@ export default function BlogPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mint/50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mint mx-auto mb-4"></div>
           <p className="text-black">Loading articles...</p>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function BlogPage() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium ${
                 selectedCategory === category
-                  ? "bg-stone-800 text-white shadow-md"
+                  ? "bg-mint text-white shadow-md"
                   : "bg-white text-black hover:bg-brown/10 border border-brown/10"
               }`}
             >
@@ -189,7 +189,9 @@ export default function BlogPage() {
                 <div className="absolute top-4 left-4 z-10">
                   <span
                     className={`px-3 py-1 text-xs font-medium rounded-full text-white ${
-                      CATEGORY_COLORS[blog.category as keyof typeof CATEGORY_COLORS] || "bg-stone-500"
+                      CATEGORY_COLORS[
+                        blog.category as keyof typeof CATEGORY_COLORS
+                      ] || "bg-stone-500"
                     }`}
                   >
                     {blog.category}

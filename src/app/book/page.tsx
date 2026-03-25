@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Clock,
-  CheckCircle2,
-  Star,
-  Shield,
-  Video,
-} from "lucide-react";
+import { Clock, CheckCircle2, Star, Shield, Video } from "lucide-react";
 import BookingForm from "@/components/BookingPage";
 import CTABanner from "@/components/Home/CTA";
 import Footer from "@/components/Home/Footer";
@@ -140,7 +134,7 @@ function BookingHero() {
 ───────────────────────────────────────────── */
 function HowItWorks() {
   return (
-    <section className="bg-mint py-14 px-6 lg:px-10">
+    <section className="bg-mint hidden lg:block py-14 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         <p className="text-mint-200 text-xs uppercase tracking-widest font-semibold mb-3">
           Process

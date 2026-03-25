@@ -47,6 +47,9 @@ export const getPosts = async (): Promise<PostRecord[]> => {
     return [];
   }
 };
+// fetch Books
+
+
 
 export const getPostById = async (id: string): Promise<PostRecord | null> => {
   try {

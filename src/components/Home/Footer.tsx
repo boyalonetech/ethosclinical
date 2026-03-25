@@ -3,6 +3,8 @@
 import { FOOTER_LINKS } from "@/app/data/footer";
 import { SOCIAL_ICONS } from "@/app/data/icon";
 import { ChevronRight, Mail } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Footer() {
@@ -14,12 +16,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 pb-10 border-b border-stone-200">
           {/* Brand */}
           <div className="flex flex-col gap-5">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-stone-700" />
-              <span className="font-semibold text-base text-stone-800 tracking-tight">
-                Ethos
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-0">
+            <Image
+              alt="/"
+              width={100}
+              height={100}
+              src="/logo.webp"
+              className=""
+            />
+          </Link>
             <p className="text-stone-600 text-sm leading-relaxed max-w-xs">
               A supportive space to reflect, grow, and feel understood —
               offering compassionate, personalised mental health support to

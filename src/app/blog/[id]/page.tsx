@@ -1,16 +1,50 @@
 // app/blog/[id]/page.tsx
 "use client";
 
-import { ArrowLeft, User, Calendar, Clock, Heart, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Calendar,
+  Clock,
+  Heart,
+  Share2,
+  X,
+} from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { getBlogPosts, BlogPost, CATEGORY_COLORS } from "@/app/data/blog";
+
+// Toast Component
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-2 fade-in duration-300">
+      <div className="bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[200px]">
+        <span className="text-sm">{message}</span>
+        <button
+          onClick={onClose}
+          className="hover:opacity-70 transition-opacity"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function BlogPostPage() {
   const router = useRouter();
   const params = useParams();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Define loadPost with useCallback to memoize it
   const loadPost = useCallback(async () => {
@@ -31,11 +65,87 @@ export default function BlogPostPage() {
     loadPost();
   }, [loadPost]); // Now loadPost is included in dependency array
 
-  // Function to render content sections safely
+  const showToast = (message: string) => {
+    setToastMessage(message);
+  };
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast("Link copied to clipboard! ✨");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showToast("Failed to copy link. Please try again.");
+    }
+  };
+
+  function getAbbreviatedTime(date: string | Date | null | undefined) {
+    if (!date) return "Invalid date";
+
+    let target: Date;
+
+    if (typeof date === "string") {
+      const isoString = date.replace(" ", "T");
+      target = new Date(isoString);
+
+      // If that fails, try the original
+      if (isNaN(target.getTime())) {
+        target = new Date(date);
+      }
+    } else {
+      target = new Date(date);
+    }
+
+    if (isNaN(target.getTime())) {
+      console.error("Invalid date:", date);
+      return "Invalid date";
+    }
+
+    const now = new Date();
+    const diffMs = now.getTime() - target.getTime();
+
+    console.log("Target date:", target);
+    console.log("Now:", now);
+    console.log("Diff in ms:", diffMs);
+    console.log("Diff in days:", diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMs < 0) {
+      console.warn(
+        "Future date detected:",
+        date,
+        "Target:",
+        target,
+        "Now:",
+        now,
+      );
+      return "Just now";
+    }
+
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+
+    // Compact format with "ago"
+    if (diffSecs < 60) return `${diffSecs} sec${diffSecs !== 1 ? "s" : ""} ago`;
+    if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hr${diffHours !== 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+    if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks} wk${weeks !== 1 ? "s" : ""} ago`;
+    }
+    if (diffMonths < 12)
+      return `${diffMonths} mo${diffMonths !== 1 ? "s" : ""} ago`;
+    return `${diffYears} yr${diffYears !== 1 ? "s" : ""} ago`;
+  }
+
   const renderContent = () => {
     if (!post) return null;
 
-    // If post has sections array and it's populated
     if (post.sections && post.sections.length > 0) {
       return post.sections.map((section) => {
         switch (section.type) {
@@ -108,7 +218,6 @@ export default function BlogPostPage() {
       });
     }
 
-    // Fallback: If no sections, try to render from excerpt
     if (post.excerpt) {
       return (
         <div className="space-y-4">
@@ -128,9 +237,9 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mint">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mint mx-auto mb-4"></div>
           <p className="text-mint">Loading article...</p>
         </div>
       </div>
@@ -160,6 +269,11 @@ export default function BlogPostPage() {
 
   return (
     <main className="w-full bg-white overflow-x-hidden">
+      {/* Toast Container */}
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
+
       <div className="w-full bg-stone-50">
         <div className="w-full px-4 md:px-8 lg:px-16 py-8 md:py-12 lg:py-16">
           <div className="max-w-[1021px] mx-auto">
@@ -190,7 +304,7 @@ export default function BlogPostPage() {
             {/* Category Badge */}
             <div className="mb-4">
               <span
-                className={`inline-block px-3 py-1 text-sm font-medium rounded-full text-white ${CATEGORY_COLORS[post.category] || "bg-stone-500"}`}
+                className={`inline-block opacity-0 px-3 py-1 text-sm font-medium rounded-full text-white ${CATEGORY_COLORS[post.category] || "bg-stone-500"}`}
               >
                 {post.category}
               </span>
@@ -209,14 +323,14 @@ export default function BlogPostPage() {
             )}
 
             {/* Meta Information */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-mint mb-8 pb-6 border-b border-gray-200">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
               <span className="flex items-center gap-1">
                 <User size={16} />
                 {post.author}
               </span>
               <span className="flex items-center gap-1">
                 <Calendar size={16} />
-                {post.date}
+                {getAbbreviatedTime(post.created)}
               </span>
               <span className="flex items-center gap-1">
                 <Clock size={16} />
@@ -225,7 +339,7 @@ export default function BlogPostPage() {
             </div>
 
             {/* Excerpt */}
-            <div className="bg-brown/1 rounded-xl p-2 px-10 mb-8">
+            <div className="bg-brown/1 rounded-xl p-2 lg:px-10 mb-8">
               <p className="text-gray-500 italic leading-relaxed text-base md:text-lg">
                 {post.excerpt}
               </p>
@@ -244,11 +358,8 @@ export default function BlogPostPage() {
                   <span>Enjoyed this article?</span>
                 </div>
                 <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Link copied to clipboard!");
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
+                  onClick={handleShare}
+                  className="flex items-center gap-2 px-4 py-2 text-white bg-mint hover:bg-brown rounded-lg transition-colors"
                 >
                   <Share2 size={16} />
                   Share this article

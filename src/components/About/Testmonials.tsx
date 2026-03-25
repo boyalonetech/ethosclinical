@@ -15,11 +15,11 @@ export default function Testimonials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map(({ quote, name, role }, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 space-x-10 md:py-10 xl:scale-100 scale-90">
+          {TESTIMONIALS.map(({ quote, name, role, color }, i) => (
             <div
               key={i}
-              className="bg-mint rounded-xl p-6 flex flex-col gap-5 hover:bg-mintl transition-colors"
+              className={` ${color} w-80 rounded-xl p-6 my-10 flex flex-col gap-5 transition-colors`}
             >
               <Quote size={22} className="text-stone-300" />
               <p className="text-white text-sm leading-relaxed flex-1">

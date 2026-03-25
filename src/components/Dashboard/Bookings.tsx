@@ -520,7 +520,7 @@ function SidebarModal({
         </div>
 
         {/* Action buttons */}
-        <div className="shrink-0 border-t border-gray-100 p-6 space-y-3 bg-white">
+        <div className="shrink-0 border-t hidden border-gray-100 p-6 space-y-3 bg-white">
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => onUpdateStatus(booking.id, "confirmed")}
@@ -736,7 +736,7 @@ export default function AdminBookings() {
   /* ─── Loading ─── */
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center flex flex-col items-center gap-6">
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-mint-400 to-mint-600 animate-pulse" />
