@@ -1,8 +1,6 @@
-// app/blog/page.tsx
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Plus,
   Edit,
@@ -20,7 +18,15 @@ import {
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
-import { getPosts, deletePost, createPost, updatePost } from "@/backend/server";
+import {
+  getPosts,
+  deletePost,
+  createPost,
+  updatePost,
+  PostRecord,
+} from "@/backend/server";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Section {
   id: string;
@@ -30,19 +36,6 @@ interface Section {
   items?: string[];
 }
 
-interface BlogPost {
-  id: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  excerpt: string;
-  author: string;
-  readTime: string;
-  image: string;
-  date: string;
-  content: string;
-}
-
 interface BlogFormData {
   category: string;
   title: string;
@@ -50,12 +43,12 @@ interface BlogFormData {
   excerpt: string;
   author: string;
   readTime: string;
-  image: string;
   date: string;
   sections: Section[];
 }
 
-// Toast Component
+// ─── Toast ────────────────────────────────────────────────────────────────────
+
 function Toast({
   message,
   type,
@@ -66,15 +59,13 @@ function Toast({
   onClose: () => void;
 }) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-    return () => clearTimeout(timer);
+    const t = setTimeout(onClose, 3000);
+    return () => clearTimeout(t);
   }, [onClose]);
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-in ${
+      className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${
         type === "success"
           ? "bg-green-50 border border-green-200 text-green-800"
           : "bg-red-50 border border-red-200 text-red-800"
@@ -105,7 +96,8 @@ function Toast({
   );
 }
 
-// Delete Confirmation Popup Component
+// ─── Delete Confirm ───────────────────────────────────────────────────────────
+
 function DeleteConfirmPopup({
   postTitle,
   onConfirm,
@@ -124,13 +116,11 @@ function DeleteConfirmPopup({
           </div>
           <h3 className="text-lg font-semibold text-black">Delete Post</h3>
         </div>
-
         <p className="text-gray-600 mb-6">
           Are you sure you want to delete &apos;
           <span className="font-medium text-black">{postTitle}</span>&apos;?
           This action cannot be undone.
         </p>
-
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
@@ -150,13 +140,15 @@ function DeleteConfirmPopup({
   );
 }
 
+// ─── Blog Page ────────────────────────────────────────────────────────────────
+
 export default function BlogPage() {
   const router = useRouter();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<PostRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [editingPost, setEditingPost] = useState<PostRecord | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -172,48 +164,31 @@ export default function BlogPage() {
 
   const fetchPosts = async () => {
     setLoading(true);
+    setError(null);
     try {
+      // getPosts() already returns records with full image URLs built in
       const data = await getPosts();
       setPosts(data);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
+    } catch (err) {
+      console.error("Error fetching posts:", err);
       setError("Failed to load blog posts");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeletePost = async (postId: string, postTitle: string) => {
-    setDeletePopup({ postId, postTitle });
-  };
-
   const confirmDelete = async () => {
-    if (deletePopup) {
-      try {
-        await deletePost(deletePopup.postId);
-        await fetchPosts();
-        setToast({ message: "Post deleted successfully!", type: "success" });
-      } catch (error) {
-        console.error("Error deleting post:", error);
-        setToast({ message: "Failed to delete post", type: "error" });
-      } finally {
-        setDeletePopup(null);
-      }
+    if (!deletePopup) return;
+    try {
+      await deletePost(deletePopup.postId);
+      await fetchPosts();
+      setToast({ message: "Post deleted successfully!", type: "success" });
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      setToast({ message: "Failed to delete post", type: "error" });
+    } finally {
+      setDeletePopup(null);
     }
-  };
-
-  const cancelDelete = () => {
-    setDeletePopup(null);
-  };
-
-  const handleEditPost = (post: BlogPost) => {
-    setEditingPost(post);
-    setShowCreateForm(true);
-  };
-
-  const handleCreatePost = () => {
-    setEditingPost(null);
-    setShowCreateForm(true);
   };
 
   const handleCloseForm = () => {
@@ -254,7 +229,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Toast Notification */}
       {toast && (
         <Toast
           message={toast.message}
@@ -263,31 +237,29 @@ export default function BlogPage() {
         />
       )}
 
-      {/* Delete Confirmation Popup */}
       {deletePopup && (
         <DeleteConfirmPopup
           postTitle={deletePopup.postTitle}
           onConfirm={confirmDelete}
-          onCancel={cancelDelete}
+          onCancel={() => setDeletePopup(null)}
         />
       )}
 
       {/* Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-black">Blog Management</h1>
-
-            {!showCreateForm && (
-              <button
-                onClick={handleCreatePost}
-                className="px-4 py-2 bg-[#8e9867] hover:bg-[#6b7348] text-white rounded-lg transition-colors flex items-center gap-2"
-              >
-                <Plus size={18} />
-                Create New Post
-              </button>
-            )}
-          </div>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-black">Blog Management</h1>
+          {!showCreateForm && (
+            <button
+              onClick={() => {
+                setEditingPost(null);
+                setShowCreateForm(true);
+              }}
+              className="px-4 py-2 bg-[#8e9867] hover:bg-[#6b7348] text-white rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Plus size={18} /> Create New Post
+            </button>
+          )}
         </div>
       </div>
 
@@ -302,7 +274,6 @@ export default function BlogPage() {
                 <ArrowLeft size={20} />
                 <span className="text-sm">Back to posts</span>
               </button>
-
               <h2 className="text-xl font-semibold text-black mb-6">
                 {editingPost ? "Edit Post" : "Create New Post"}
               </h2>
@@ -313,111 +284,105 @@ export default function BlogPage() {
               showToast={setToast}
             />
           </>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-24 bg-gray-50 rounded-xl">
+            <p className="text-gray-400 mb-4">No blog posts yet</p>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="px-4 py-2 bg-[#8e9867] text-white rounded-lg inline-flex items-center gap-2"
+            >
+              <Plus size={18} /> Create Your First Post
+            </button>
+          </div>
         ) : (
-          <>
-            {/* Blog Posts Grid */}
-            {posts.length === 0 ? (
-              <div className="text-center py-24 bg-gray-50 rounded-xl">
-                <p className="text-gray-400 mb-4">No blog posts yet</p>
-                <button
-                  onClick={handleCreatePost}
-                  className="px-4 py-2 bg-[#8e9867] text-white rounded-lg inline-flex items-center gap-2"
-                >
-                  <Plus size={18} />
-                  Create Your First Post
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-8">
-                {posts.map((post) => (
-                  <article
-                    key={post.id}
-                    className="group bg-white relative rounded-xl shadow-md border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all overflow-hidden"
-                  >
-                    {post.image && (
-                      <div className="relative h-64 overflow-hidden">
-                        <Image
-                          src={post.image}
-                          alt={post.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src =
-                              "https://placehold.co/1200x800?text=Image+Not+Found";
-                          }}
-                          unoptimized={post.image.includes("placehold.co")}
-                        />
-                      </div>
-                    )}
+          <div className="grid grid-cols-2 gap-8">
+            {posts.map((post) => (
+              <article
+                key={post.id}
+                className="group bg-white relative rounded-xl shadow-md border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all overflow-hidden"
+              >
+                {/* Use plain <img> — avoids Next.js domain whitelist requirement */}
+                {post.image && (
+                  <div className="relative h-64 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://placehold.co/1200x800?text=Image+Not+Found";
+                      }}
+                    />
+                  </div>
+                )}
 
-                    <div className="p-8">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-medium text-[#8e9867] bg-[#8e9867]/10 px-3 py-1 rounded-full">
-                            {post.category}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleEditPost(post)}
-                            className="p-2 text-gray-400 hover:text-[#8e9867] transition-colors"
-                            title="Edit post"
-                          >
-                            <Edit size={18} />
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDeletePost(post.id, post.title)
-                            }
-                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                            title="Delete post"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <h2 className="text-2xl font-bold line-clamp-2 text-black mb-3 hover:text-[#8e9867] transition-colors">
-                        {post.title}
-                      </h2>
-
-                      {post.subtitle && (
-                        <p className="text-gray-600 line-clamp-2 mb-4">
-                          {post.subtitle}
-                        </p>
-                      )}
-
-                      <p className="text-gray-700 mb-6 line-clamp-3">
-                        {post.excerpt}
-                      </p>
-
+                <div className="p-8">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-xs font-medium text-[#8e9867] bg-[#8e9867]/10 px-3 py-1 rounded-full">
+                      {post.category}
+                    </span>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => router.push(`/blog/${post.id}`)}
-                        className="text-[#8e9867] absolute bottom-3 font-medium hover:text-[#6b7348] transition-colors inline-flex items-center gap-1"
+                        onClick={() => {
+                          setEditingPost(post);
+                          setShowCreateForm(true);
+                        }}
+                        className="p-2 text-gray-400 hover:text-[#8e9867] transition-colors"
+                        title="Edit post"
                       >
-                        Read More →
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          setDeletePopup({
+                            postId: post.id,
+                            postTitle: post.title,
+                          })
+                        }
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Delete post"
+                      >
+                        <Trash2 size={18} />
                       </button>
                     </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
+                  </div>
+
+                  <h2 className="text-2xl font-bold line-clamp-2 text-black mb-3 hover:text-[#8e9867] transition-colors">
+                    {post.title}
+                  </h2>
+                  {post.subtitle && (
+                    <p className="text-gray-600 line-clamp-2 mb-4">
+                      {post.subtitle}
+                    </p>
+                  )}
+                  <p className="text-gray-700 mb-6 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <button
+                    onClick={() => router.push(`/blog/${post.id}`)}
+                    className="text-[#8e9867] absolute bottom-3 font-medium hover:text-[#6b7348] transition-colors inline-flex items-center gap-1"
+                  >
+                    Read More →
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-// Create Post Form Component with Original UI
+// ─── Create / Edit Form ───────────────────────────────────────────────────────
+
 function CreatePostForm({
   postToEdit,
   onSuccess,
   showToast,
 }: {
-  postToEdit?: BlogPost | null;
+  postToEdit?: PostRecord | null;
   onSuccess: () => void;
   showToast: (toast: { message: string; type: "success" | "error" }) => void;
 }) {
@@ -428,7 +393,6 @@ function CreatePostForm({
     excerpt: "",
     author: "",
     readTime: "",
-    image: "",
     date: new Date().toISOString().split("T")[0],
     sections: [],
   });
@@ -438,6 +402,9 @@ function CreatePostForm({
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [fetchingPost, setFetchingPost] = useState(false);
   const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  // Holds either a base64 data URL (new file picked) or the full PB URL (existing image)
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const categories = [
     "Moral Injury",
@@ -450,179 +417,192 @@ function CreatePostForm({
     "Professional Development",
   ];
 
-  const loadPostForEdit = useCallback(
-    async (id: string) => {
-      console.log(id);
-      setFetchingPost(true);
-      setError(null);
+  // Load the post data into form state for editing
+  const loadPostForEdit = useCallback((record: PostRecord) => {
+    setFetchingPost(true);
+    setError(null);
+    try {
+      let sections: Section[] = [];
       try {
-        const record = postToEdit;
-        if (record) {
-          let sections: Section[] = [];
-          try {
-            const contentData =
-              typeof record.content === "string"
-                ? JSON.parse(record.content)
-                : record.content;
+        const contentData =
+          typeof record.content === "string"
+            ? JSON.parse(record.content)
+            : record.content;
 
-            if (Array.isArray(contentData)) {
-              sections = contentData.map(
-                (item: Partial<Section>, index: number) => ({
-                  id: item.id || `section-${Date.now()}-${index}`,
-                  type: item.type || "paragraph",
-                  title: item.title,
-                  content: item.content || "",
-                  items: item.items,
-                }),
-              );
-            } else if (
-              contentData.sections &&
-              Array.isArray(contentData.sections)
-            ) {
-              sections = contentData.sections;
-            } else {
-              sections = [];
-            }
-          } catch (e) {
-            console.error("Error parsing content:", e);
-            sections = [];
-          }
-
-          setFormData({
-            category: record.category || "",
-            title: record.title || "",
-            subtitle: record.subtitle || "",
-            excerpt: record.excerpt || "",
-            author: record.author || "",
-            readTime: record.readTime || "",
-            image: record.image || "",
-            date: record.date || new Date().toISOString().split("T")[0],
-            sections: sections,
-          });
-        } else {
-          setError("Post not found");
+        if (Array.isArray(contentData)) {
+          sections = contentData.map(
+            (item: Partial<Section>, index: number) => ({
+              id: item.id || `section-${Date.now()}-${index}`,
+              type: item.type || "paragraph",
+              title: item.title,
+              content: item.content || "",
+              items: item.items,
+            }),
+          );
+        } else if (
+          contentData.sections &&
+          Array.isArray(contentData.sections)
+        ) {
+          sections = contentData.sections;
         }
-      } catch (error) {
-        console.error("Error fetching post:", error);
-        setError("Failed to load post for editing");
-      } finally {
-        setFetchingPost(false);
+      } catch (e) {
+        console.error("Error parsing content:", e);
+        sections = [];
       }
-    },
-    [postToEdit],
-  ); // Add postToEdit as dependency
+
+      setFormData({
+        category: record.category || "",
+        title: record.title || "",
+        subtitle: record.subtitle || "",
+        excerpt: record.excerpt || "",
+        author: record.author || "",
+        readTime: record.readTime || "",
+        // PocketBase date format: "2026-03-27 00:00:00.000Z" — strip the time part
+        date: record.date
+          ? record.date.split(" ")[0]
+          : new Date().toISOString().split("T")[0],
+        sections,
+      });
+
+      // record.image is already a full URL (built by normalizeRecord in server.ts)
+      if (record.image) {
+        setImagePreview(record.image);
+      }
+    } catch (err) {
+      console.error("Error loading post:", err);
+      setError("Failed to load post for editing");
+    } finally {
+      setFetchingPost(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (postToEdit) {
-      loadPostForEdit(postToEdit.id);
+    if (postToEdit) loadPostForEdit(postToEdit);
+  }, [postToEdit, loadPostForEdit]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
     }
-  }, [postToEdit, loadPostForEdit]); // Now both dependencies are included
+  };
+
+  // ── Section helpers ──────────────────────────────────────────────────────────
 
   const addSection = (type: Section["type"]) => {
-    const newSection: Section = {
+    const s: Section = {
       id: Date.now().toString(),
-      type: type,
+      type,
       content: "",
       items:
         type === "bulletList" || type === "numberedList" ? [""] : undefined,
     };
-    setFormData((prev) => ({
-      ...prev,
-      sections: [...prev.sections, newSection],
-    }));
-    setActiveSection(newSection.id);
+    setFormData((prev) => ({ ...prev, sections: [...prev.sections, s] }));
+    setActiveSection(s.id);
   };
 
-  const updateSection = (id: string, updates: Partial<Section>) => {
+  const updateSection = (id: string, updates: Partial<Section>) =>
     setFormData((prev) => ({
       ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === id ? { ...section, ...updates } : section,
+      sections: prev.sections.map((s) =>
+        s.id === id ? { ...s, ...updates } : s,
       ),
     }));
-  };
 
-  const addListItem = (sectionId: string) => {
+  const removeSection = (id: string) =>
     setFormData((prev) => ({
       ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === sectionId &&
-        (section.type === "bulletList" || section.type === "numberedList")
-          ? { ...section, items: [...(section.items || []), ""] }
-          : section,
+      sections: prev.sections.filter((s) => s.id !== id),
+    }));
+
+  const addListItem = (sectionId: string) =>
+    setFormData((prev) => ({
+      ...prev,
+      sections: prev.sections.map((s) =>
+        s.id === sectionId &&
+        (s.type === "bulletList" || s.type === "numberedList")
+          ? { ...s, items: [...(s.items || []), ""] }
+          : s,
       ),
     }));
-  };
 
-  const updateListItem = (sectionId: string, index: number, value: string) => {
+  const updateListItem = (sectionId: string, index: number, value: string) =>
     setFormData((prev) => ({
       ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === sectionId &&
-        (section.type === "bulletList" || section.type === "numberedList")
+      sections: prev.sections.map((s) =>
+        s.id === sectionId &&
+        (s.type === "bulletList" || s.type === "numberedList")
           ? {
-              ...section,
-              items: section.items?.map((item, i) =>
-                i === index ? value : item,
-              ),
+              ...s,
+              items: s.items?.map((item, i) => (i === index ? value : item)),
             }
-          : section,
+          : s,
       ),
     }));
-  };
 
-  const removeListItem = (sectionId: string, index: number) => {
+  const removeListItem = (sectionId: string, index: number) =>
     setFormData((prev) => ({
       ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === sectionId &&
-        (section.type === "bulletList" || section.type === "numberedList")
-          ? { ...section, items: section.items?.filter((_, i) => i !== index) }
-          : section,
+      sections: prev.sections.map((s) =>
+        s.id === sectionId &&
+        (s.type === "bulletList" || s.type === "numberedList")
+          ? { ...s, items: s.items?.filter((_, i) => i !== index) }
+          : s,
       ),
     }));
-  };
 
-  const removeSection = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      sections: prev.sections.filter((section) => section.id !== id),
-    }));
-  };
+  // ── Submit ───────────────────────────────────────────────────────────────────
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const data = {
-      ...formData,
-      content: JSON.stringify(formData.sections),
-    };
-
     try {
+      const payload = new FormData();
+      payload.append("category", formData.category);
+      payload.append("title", formData.title);
+      payload.append("subtitle", formData.subtitle);
+      payload.append("excerpt", formData.excerpt);
+      payload.append("author", formData.author);
+      payload.append("readTime", formData.readTime);
+      payload.append("date", formData.date);
+      payload.append("content", JSON.stringify(formData.sections));
+
+      // Only include image if the user picked a new file.
+      // PocketBase keeps the existing image if "image" is not in the payload.
+      if (imageFile) {
+        payload.append("image", imageFile);
+      }
+
       if (postToEdit) {
-        await updatePost(postToEdit.id, data);
+        await updatePost(postToEdit.id, payload);
         showToast({
           message: "Blog post updated successfully!",
           type: "success",
         });
       } else {
-        await createPost(data);
+        await createPost(payload);
         showToast({
           message: "Blog post created successfully!",
           type: "success",
         });
       }
+
       onSuccess();
-    } catch (error) {
-      console.error("Error saving post:", error);
+    } catch (err) {
+      console.error("Error saving post:", err);
       setError("Failed to save blog post. Please try again.");
       showToast({ message: "Failed to save blog post", type: "error" });
     } finally {
       setLoading(false);
     }
   };
+
+  // ── Section renderers ────────────────────────────────────────────────────────
 
   const renderSectionEditor = (section: Section) => {
     switch (section.type) {
@@ -711,123 +691,120 @@ function CreatePostForm({
     }
   };
 
-  const renderPreview = () => {
-    return (
-      <div className="max-w-none">
-        {formData.image && (
-          <div className="relative mb-8 rounded-xl overflow-hidden bg-gray-100 h-96">
-            <Image
-              src={formData.image}
-              alt={formData.title}
-              fill
-              className="object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://placehold.co/1200x800?text=Image+Preview";
-              }}
-              unoptimized={formData.image.includes("placehold.co")}
-            />
-          </div>
-        )}
-
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-black mb-4 leading-tight">
-            {formData.title || "Untitled Post"}
-          </h1>
-          {formData.subtitle && (
-            <p className="text-xl text-gray-600 mb-6">{formData.subtitle}</p>
-          )}
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
-            <span className="flex items-center gap-2">
-              <User size={14} /> {formData.author || "Author Name"}
-            </span>
-            <span className="flex items-center gap-2">
-              <Calendar size={14} /> {formData.date || "Date"}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock size={14} /> {formData.readTime || "5 min read"}
-            </span>
-          </div>
+  const renderPreview = () => (
+    <div className="max-w-none">
+      {imagePreview && (
+        <div className="mb-8 rounded-xl overflow-hidden bg-gray-100 h-96">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imagePreview}
+            alt={formData.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://placehold.co/1200x800?text=Image+Preview";
+            }}
+          />
         </div>
+      )}
 
-        <div className="mb-12">
-          <blockquote className="border-l-4 border-[#8e9867] pl-6 py-2 text-gray-600 italic text-lg">
-            {formData.excerpt || "No excerpt provided"}
-          </blockquote>
-        </div>
-
-        {formData.sections.length === 0 && (
-          <div className="text-center py-16 bg-gray-50 rounded-xl">
-            <p className="text-gray-400">No content added yet</p>
-          </div>
+      <div className="text-center mb-12">
+        <h1 className="text-5xl font-bold text-black mb-4 leading-tight">
+          {formData.title || "Untitled Post"}
+        </h1>
+        {formData.subtitle && (
+          <p className="text-xl text-gray-600 mb-6">{formData.subtitle}</p>
         )}
-
-        <div className="space-y-8">
-          {formData.sections.map((section) => {
-            switch (section.type) {
-              case "heading":
-                return (
-                  <div key={section.id} className="space-y-3">
-                    {section.title && (
-                      <h2 className="text-3xl font-semibold text-black">
-                        {section.title}
-                      </h2>
-                    )}
-                    <p className="text-gray-700 leading-relaxed">
-                      {section.content || "[Empty heading content]"}
-                    </p>
-                  </div>
-                );
-              case "bulletList":
-                return (
-                  <div key={section.id} className="space-y-3">
-                    {section.title && (
-                      <h3 className="text-xl font-medium text-black">
-                        {section.title}
-                      </h3>
-                    )}
-                    <ul className="space-y-2">
-                      {section.items?.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-3 text-gray-700"
-                        >
-                          <span className="text-[#8e9867] mt-1">•</span>
-                          <span>{item || "[Empty item]"}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              case "numberedList":
-                return (
-                  <div key={section.id} className="space-y-3">
-                    {section.title && (
-                      <h3 className="text-xl font-medium text-black">
-                        {section.title}
-                      </h3>
-                    )}
-                    <ol className="space-y-2 list-decimal list-inside">
-                      {section.items?.map((item, idx) => (
-                        <li key={idx} className="text-gray-700">
-                          {item || "[Empty item]"}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                );
-              default:
-                return (
-                  <p key={section.id} className="text-gray-700 leading-relaxed">
-                    {section.content || "[Empty paragraph content]"}
-                  </p>
-                );
-            }
-          })}
+        <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+          <span className="flex items-center gap-2">
+            <User size={14} /> {formData.author || "Author Name"}
+          </span>
+          <span className="flex items-center gap-2">
+            <Calendar size={14} /> {formData.date || "Date"}
+          </span>
+          <span className="flex items-center gap-2">
+            <Clock size={14} /> {formData.readTime || "5 min read"}
+          </span>
         </div>
       </div>
-    );
-  };
+
+      <div className="mb-12">
+        <blockquote className="border-l-4 border-[#8e9867] pl-6 py-2 text-gray-600 italic text-lg">
+          {formData.excerpt || "No excerpt provided"}
+        </blockquote>
+      </div>
+
+      {formData.sections.length === 0 && (
+        <div className="text-center py-16 bg-gray-50 rounded-xl">
+          <p className="text-gray-400">No content added yet</p>
+        </div>
+      )}
+
+      <div className="space-y-8">
+        {formData.sections.map((section) => {
+          switch (section.type) {
+            case "heading":
+              return (
+                <div key={section.id} className="space-y-3">
+                  {section.title && (
+                    <h2 className="text-3xl font-semibold text-black">
+                      {section.title}
+                    </h2>
+                  )}
+                  <p className="text-gray-700 leading-relaxed">
+                    {section.content || "[Empty heading content]"}
+                  </p>
+                </div>
+              );
+            case "bulletList":
+              return (
+                <div key={section.id} className="space-y-3">
+                  {section.title && (
+                    <h3 className="text-xl font-medium text-black">
+                      {section.title}
+                    </h3>
+                  )}
+                  <ul className="space-y-2">
+                    {section.items?.map((item, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-3 text-gray-700"
+                      >
+                        <span className="text-[#8e9867] mt-1">•</span>
+                        <span>{item || "[Empty item]"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            case "numberedList":
+              return (
+                <div key={section.id} className="space-y-3">
+                  {section.title && (
+                    <h3 className="text-xl font-medium text-black">
+                      {section.title}
+                    </h3>
+                  )}
+                  <ol className="space-y-2 list-decimal list-inside">
+                    {section.items?.map((item, idx) => (
+                      <li key={idx} className="text-gray-700">
+                        {item || "[Empty item]"}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            default:
+              return (
+                <p key={section.id} className="text-gray-700 leading-relaxed">
+                  {section.content || "[Empty paragraph content]"}
+                </p>
+              );
+          }
+        })}
+      </div>
+    </div>
+  );
 
   if (fetchingPost) {
     return (
@@ -845,8 +822,7 @@ function CreatePostForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
-          <AlertCircle size={20} />
-          {error}
+          <AlertCircle size={20} /> {error}
         </div>
       )}
 
@@ -971,88 +947,88 @@ function CreatePostForm({
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                Featured Image URL
+                Featured Image
               </label>
               <input
-                type="text"
-                value={formData.image}
-                onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
-                }
-                className="w-full px-0 py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all text-black"
-                placeholder="https://example.com/image.jpg"
-                required
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full px-0 py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-[#8e9867] file:text-white hover:file:bg-[#6b7348]"
               />
+              {/* Works for both new local files (base64) and existing PB image URLs */}
+              {imagePreview && (
+                <div className="mt-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-24 w-24 object-cover rounded-lg border border-gray-200"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content Editor Tabs */}
+      {/* Content Tabs */}
       <div className="mb-8">
         <div className="flex gap-4 border-b border-gray-100">
-          <button
-            type="button"
-            onClick={() => setActiveTab("write")}
-            className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
-              activeTab === "write"
-                ? "text-[#8e9867]"
-                : "text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            Write
-            {activeTab === "write" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8e9867]" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("preview")}
-            className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
-              activeTab === "preview"
-                ? "text-[#8e9867]"
-                : "text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            Preview
-            {activeTab === "preview" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8e9867]" />
-            )}
-          </button>
+          {(["write", "preview"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 px-2 text-sm font-medium transition-colors relative capitalize ${activeTab === tab ? "text-[#8e9867]" : "text-gray-400 hover:text-gray-600"}`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8e9867]" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
       {activeTab === "write" ? (
         <div className="space-y-6">
           <div className="flex gap-2 pb-4 border-b border-gray-100">
-            <button
-              type="button"
-              onClick={() => addSection("paragraph")}
-              className="px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <FileText size={16} /> Paragraph
-            </button>
-            <button
-              type="button"
-              onClick={() => addSection("heading")}
-              className="px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Type size={16} /> Heading
-            </button>
-            <button
-              type="button"
-              onClick={() => addSection("bulletList")}
-              className="px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <List size={16} /> Bullet List
-            </button>
-            <button
-              type="button"
-              onClick={() => addSection("numberedList")}
-              className="px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <ListOrdered size={16} /> Numbered List
-            </button>
+            {(
+              [
+                {
+                  type: "paragraph",
+                  label: "Paragraph",
+                  icon: <FileText size={16} />,
+                },
+                { type: "heading", label: "Heading", icon: <Type size={16} /> },
+                {
+                  type: "bulletList",
+                  label: "Bullet List",
+                  icon: <List size={16} />,
+                },
+                {
+                  type: "numberedList",
+                  label: "Numbered List",
+                  icon: <ListOrdered size={16} />,
+                },
+              ] as {
+                type: Section["type"];
+                label: string;
+                icon: React.ReactNode;
+              }[]
+            ).map(({ type, label, icon }) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => addSection(type)}
+                className="px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {icon} {label}
+              </button>
+            ))}
           </div>
 
           {formData.sections.length === 0 && (
@@ -1067,9 +1043,7 @@ function CreatePostForm({
           {formData.sections.map((section) => (
             <div
               key={section.id}
-              className={`group relative transition-all ${
-                activeSection === section.id ? "bg-gray-50" : ""
-              }`}
+              className={`group relative transition-all ${activeSection === section.id ? "bg-gray-50" : ""}`}
               onClick={() => setActiveSection(section.id)}
             >
               <div className="absolute right-2 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1102,7 +1076,7 @@ function CreatePostForm({
         <div className="bg-white rounded-xl">{renderPreview()}</div>
       )}
 
-      {/* Form Actions */}
+      {/* Actions */}
       <div className="sticky bottom-0 bg-white border-t border-gray-100 mt-8 py-4 flex justify-end gap-3">
         <button
           type="button"

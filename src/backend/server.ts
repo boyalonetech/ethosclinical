@@ -3,16 +3,13 @@ import PocketBase from 'pocketbase';
 
 const database = process.env.NEXT_PUBLIC_DATABASE_API || 'http://127.0.0.1:8090';
 
-// Initialize PocketBase connection
 export const db = new PocketBase(database);
-
-// Optional: Auto-cancellation to prevent memory leaks
 db.autoCancellation(false);
 
-// Helper functions for posts collection
 export const postsCollection = db.collection('posts');
 
-// Define the Blog Post type
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export interface BlogPostData {
   category: string;
   title: string;
@@ -20,13 +17,12 @@ export interface BlogPostData {
   excerpt: string;
   author: string;
   readTime: string;
-  image: string;
+  image: string; // raw filename from PocketBase e.g. "photo_abc123.jpeg"
   date: string;
-  content: string; // JSON string of sections
-  [key: string]: unknown; // Allow for additional fields from PocketBase
+  content: string;
+  [key: string]: unknown;
 }
 
-// Type for PocketBase record
 export interface PostRecord extends BlogPostData {
   id: string;
   created: string;
@@ -36,45 +32,67 @@ export interface PostRecord extends BlogPostData {
   [key: string]: unknown;
 }
 
+// ─── Image URL helper ─────────────────────────────────────────────────────────
+
+// PocketBase stores only the filename in the `image` field.
+// The full URL format is: {baseUrl}/api/files/{collectionId}/{recordId}/{filename}
+function buildImageUrl(record: PostRecord): string {
+  if (!record.image) return '';
+  // If it's already a full URL (shouldn't happen, but guard anyway)
+  if (record.image.startsWith('http')) return record.image;
+  return `${database}/api/files/${record.collectionId}/${record.id}/${record.image}`;
+}
+
+// Transforms a raw PocketBase record so `image` is always a full usable URL
+function normalizeRecord(record: PostRecord): PostRecord {
+  return {
+    ...record,
+    image: buildImageUrl(record),
+  };
+}
+
+// ─── CRUD ─────────────────────────────────────────────────────────────────────
+
 export const getPosts = async (): Promise<PostRecord[]> => {
   try {
-    const records = await postsCollection.getFullList({
-      sort: '-created',
-    });
-    return records as PostRecord[];
+    const records = await postsCollection.getFullList({ sort: '-created' });
+    return (records as PostRecord[]).map(normalizeRecord);
   } catch (error) {
     console.error('Error fetching posts:', error);
     return [];
   }
 };
-// fetch Books
-
-
 
 export const getPostById = async (id: string): Promise<PostRecord | null> => {
   try {
     const record = await postsCollection.getOne(id);
-    return record as PostRecord;
+    return normalizeRecord(record as PostRecord);
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
 };
 
-export const createPost = async (data: Omit<BlogPostData, 'id' | 'created' | 'updated' | 'collectionId' | 'collectionName'>): Promise<PostRecord> => {
+// Accepts FormData so file uploads work correctly.
+// The PocketBase SDK passes FormData straight through to the API as multipart.
+// Do NOT change this back to a plain object type — file fields require FormData.
+export const createPost = async (data: FormData): Promise<PostRecord> => {
   try {
     const record = await postsCollection.create(data);
-    return record as PostRecord;
+    return normalizeRecord(record as PostRecord);
   } catch (error) {
     console.error('Error creating post:', error);
     throw error;
   }
 };
 
-export const updatePost = async (id: string, data: Partial<Omit<BlogPostData, 'id' | 'created' | 'updated' | 'collectionId' | 'collectionName'>>): Promise<PostRecord> => {
+// Same — must be FormData so that a newly chosen image file is sent correctly.
+// If no new image is chosen, simply don't append "image" to the FormData and
+// PocketBase will leave the existing image untouched.
+export const updatePost = async (id: string, data: FormData): Promise<PostRecord> => {
   try {
     const record = await postsCollection.update(id, data);
-    return record as PostRecord;
+    return normalizeRecord(record as PostRecord);
   } catch (error) {
     console.error('Error updating post:', error);
     throw error;
@@ -91,7 +109,8 @@ export const deletePost = async (id: string): Promise<boolean> => {
   }
 };
 
-// Optional: Type for booking data if you have bookings collection
+// ─── Bookings (unchanged) ─────────────────────────────────────────────────────
+
 export interface BookingData {
   firstName: string;
   lastName: string;
