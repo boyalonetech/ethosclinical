@@ -8,8 +8,8 @@ import {
   useScroll,
   useTransform,
   AnimatePresence,
+  type Variants, // ← add this
 } from "framer-motion";
-
 // Elegant rotating image set for the hero animation
 const heroImages = [
   {
@@ -32,7 +32,6 @@ const heroImages = [
     alt: "Mindful supervision setting",
     gradient: "from-[#0f2027]/20 to-[#203a43]/10",
   },
-
   {
     url: "/hero4.jpg",
     alt: "Mindful supervision setting",
@@ -50,8 +49,8 @@ export default function Hero() {
   });
 
   // Parallax and opacity effects based on scroll
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 30]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   // Rotate images every 5 seconds
@@ -64,24 +63,44 @@ export default function Hero() {
 
   const currentImage = heroImages[currentImageIndex];
 
+  const imageSlideVariants: Variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.8,
+      rotateY: direction > 0 ? -15 : 15,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1] as const, // ← add "as const"
+      },
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+      scale: 0.8,
+      rotateY: direction > 0 ? 15 : -15,
+      transition: {
+        duration: 0.6,
+        ease: [0.4, 0, 0.2, 1] as const, // ← add "as const"
+      },
+    }),
+  };
+
   return (
     <section
       ref={containerRef}
-      className="relative bg-stone-50 pt-20 pb-12 px-6 lg:px-10 overflow-hidden"
+      className="relative bg-stone-50 pt-20 pb-12 px-6 lg:px-10 overflow-hidden min-h-screen"
     >
-      {/* Background gradient overlay that changes with image */}
-      {/* <motion.div
-        key={currentImageIndex}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, ease: "easeInOut" }}
-        className={`absolute inset-0 bg-gradient-to-br pointer-events-none z-0`}
-      /> */}
-
       <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
           style={{ y: contentY, opacity: contentOpacity }}
-          className="flex  flex-col items-center text-center gap-6"
+          className="flex flex-col items-center text-center gap-6"
         >
           {/* Animated AvatarStack with subtle entrance */}
           <motion.div
@@ -97,7 +116,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-4xl sm:text-5xl  lg:text-6xl xl:text-7xl font-semibold text-stone-900 leading-tight max-w-4xl font-['Geist',sans-serif] tracking-tight"
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-stone-900 leading-tight max-w-4xl font-['Geist',sans-serif] tracking-tight"
           >
             Clinical Supervision That Makes a{" "}
             <span className="relative inline-block">
@@ -106,7 +125,7 @@ export default function Hero() {
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="absolute h-1.5 bottom-0  left-0 lg:h-3 bg-mint/30 z-0 rounded-full"
+                className="absolute h-1.5 bottom-0 left-0 lg:h-3 bg-mint/30 z-0 rounded-full"
               />
             </span>{" "}
             in Practice
@@ -147,30 +166,43 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Hero Image Section with cinematic transitions */}
+        {/* Hero Image Section with modern cinematic transitions */}
         <motion.div
           style={{ scale: imageScale }}
-          className="w-full mt-12 section lg:scale-80 lg:mt-16 rounded-2xl overflow-hidden shadow-2xl relative"
+          className="w-full mt-12 lg:mt-16 rounded-2xl overflow-hidden relative group"
         >
-          <div className="relative bg-stone-200">
-            <AnimatePresence mode="wait">
+          <div className="relative w-full aspect-video">
+            <AnimatePresence mode="wait" custom={currentImageIndex}>
+              {/* Modern Slide + Fade + Scale Transition */}
               <motion.img
                 key={currentImage.url}
                 src={currentImage.url}
                 alt={currentImage.alt}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.85 }}
-                transition={{ duration: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-                className="w-full h-full object-cover"
+                custom={currentImageIndex}
+                variants={imageSlideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute inset-0 w-full h-full rounded-2xl shadow-2xl object-cover"
+                style={{ willChange: "transform, opacity" }}
               />
             </AnimatePresence>
 
-            {/* Elegant overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-900/20 via-transparent to-transparent pointer-events-none" />
+            {/* Dynamic gradient overlay that changes with image */}
+            <motion.div
+              key={`gradient-${currentImageIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className={`absolute inset-0 bg-gradient-to-t  pointer-events-none rounded-2xl`}
+            />
 
-            {/* Subtle image counter indicator */}
-            <div className="absolute bottom-4 right-4 flex gap-1.5">
+            {/* Modern glass morphism overlay on hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/0 via-black/0 to-black/0 group-hover:from-black/10 group-hover:via-black/5 group-hover:to-transparent transition-all duration-500 rounded-2xl pointer-events-none" />
+
+            {/* Enhanced image counter indicator with modern styling */}
+            <div className="absolute bottom-6 right-6 flex gap-2 z-10 bg-black/20 backdrop-blur-md px-3 py-2 rounded-full">
               {heroImages.map((_, idx) => (
                 <button
                   key={idx}
@@ -178,22 +210,53 @@ export default function Hero() {
                   className="group focus:outline-none"
                   aria-label={`View image ${idx + 1}`}
                 >
-                  <div
-                    className={`h-1.5 rounded-full transition-all duration-500 ${
+                  <motion.div
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`h-2 rounded-full transition-all duration-500 ${
                       idx === currentImageIndex
-                        ? "w-6 bg-white"
-                        : "w-1.5 bg-white/50 group-hover:bg-white/80"
+                        ? "w-8 bg-white shadow-lg"
+                        : "w-2 bg-white/50 group-hover:bg-white/80"
                     }`}
                   />
                 </button>
               ))}
             </div>
+
+            {/* Modern image counter text */}
+            <div className="absolute bottom-6 left-6 z-10 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-sm font-medium">
+              {String(currentImageIndex + 1).padStart(2, "0")} /{" "}
+              {String(heroImages.length).padStart(2, "0")}
+            </div>
           </div>
         </motion.div>
 
-        {/* Decorative abstract elements */}
-        <div className="absolute top-1/3 left-0 w-64 h-64 bg-mint/5 rounded-full blur-3xl -z-10 animate-pulse-slow" />
-        <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-stone-300/20 rounded-full blur-3xl -z-10 animate-pulse-slow animation-delay-1000" />
+        {/* Decorative abstract elements with modern animations */}
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/3 left-0 w-64 h-64 bg-mint/5 rounded-full blur-3xl -z-10"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="absolute bottom-1/4 right-0 w-80 h-80 bg-stone-300/20 rounded-full blur-3xl -z-10"
+        />
       </div>
     </section>
   );

@@ -1,6 +1,13 @@
-import { Users, UserRound, Building2, Brain, Crown, Globe } from "lucide-react";
+// app/data/supervision.ts
+import { Users, UserRound, Building2, Brain, Crown, Globe, LucideIcon } from "lucide-react";
 
-export const SUPERVISION_TYPES = [
+export interface SupervisionType {
+  icon: LucideIcon;
+  title: string;
+  desc: string;
+}
+
+export const SUPERVISION_TYPES: SupervisionType[] = [
   {
     icon: UserRound,
     title: "Individual Clinical Supervision",
