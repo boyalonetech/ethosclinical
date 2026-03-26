@@ -995,7 +995,7 @@ function CreatePostForm({
 
       {activeTab === "write" ? (
         <div className="space-y-6">
-          <div className="flex gap-2 pb-4 border-b border-gray-100">
+          <div className="flex gap-2 py-4 border-b sticky top-0 z-60 bg-white border-gray-100">
             {(
               [
                 {

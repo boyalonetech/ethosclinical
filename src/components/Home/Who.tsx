@@ -49,7 +49,7 @@ export default function WhoWeAre() {
           </div>
 
           <a
-            href="#"
+            href="/about"
             className="inline-flex items-center gap-2 text-mint text-base font-normal font-['Bona_Nova',serif] hover:gap-3 transition-all self-start"
           >
             About Us <ArrowRight size={16} />

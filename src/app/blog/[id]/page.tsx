@@ -340,7 +340,7 @@ export default function BlogPostPage() {
 
             {/* Excerpt */}
             <div className="bg-brown/1 rounded-xl p-2 lg:px-10 mb-8">
-              <p className="text-gray-500 italic leading-relaxed text-base md:text-lg">
+              <p className="text-black italic leading-relaxed text-base md:text-lg">
                 {post.excerpt}
               </p>
             </div>
