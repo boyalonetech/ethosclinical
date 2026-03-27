@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ReservationPage() {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ export default function ReservationPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [step, setStep] = useState<"form" | "payment" | "success">("form");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +44,11 @@ export default function ReservationPage() {
       if (!res.ok) throw new Error("API Error");
       
       setIsSubmitting(false);
-      setIsSubmitted(true);
+      setStep("payment");
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
-      alert("Failed to confirm reservation. Please try again.");
+      toast.error("Failed to confirm reservation. Please try again.");
     }
   };
 
@@ -222,7 +223,7 @@ export default function ReservationPage() {
       <div className="w-full lg:w-[42%] xl:w-[31%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-white p-8 md:p-12 lg:p-0 xl:py-0 flex flex-col relative min-h-screen lg:min-h-0 z-10">
         <div className="max-w-[440px] w-full mx-auto my-auto py-10 lg:py-12">
           <AnimatePresence mode="wait">
-            {!isSubmitted ? (
+            {step === "form" && (
               <motion.div
                 key="form"
                 initial={{ opacity: 0, x: 20 }}
@@ -403,7 +404,52 @@ export default function ReservationPage() {
                   </div>
                 </form>
               </motion.div>
-            ) : (
+            )}
+
+            {step === "payment" && (
+              <motion.div
+                key="payment"
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="text-center py-10 flex flex-col items-center justify-center h-full min-h-[400px]"
+              >
+                <h2 className="text-[2rem] font-bold text-stone-900 mb-4 tracking-tight">
+                  Complete Payment
+                </h2>
+                <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto">
+                  To finalise your reservation, please transfer the fee of 
+                  <span className="font-bold text-stone-800"> ${formData.tickets * 400} ({formData.tickets} {formData.tickets === 1 ? 'ticket' : 'tickets'}, $400 for each couple)</span>.
+                </p>
+
+                <div className="bg-stone-50/80 border border-stone-200/50 rounded-xl p-5 mb-10 w-full max-w-[340px] text-left mx-auto">
+                  <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">Payment Details</h3>
+                  <div className="space-y-2 text-[14.5px]">
+                    <div className="flex justify-between">
+                      <span className="text-stone-500">Account Name:</span>
+                      <span className="font-semibold text-stone-800">Ethos Clinical</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-stone-500">BSB:</span>
+                      <span className="font-semibold text-stone-800">123-456</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-stone-500">Account Number:</span>
+                      <span className="font-semibold text-stone-800">1234 5678</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setStep("success")}
+                  className="w-full max-w-[340px] h-14 bg-[#8c9c74] hover:bg-[#7a8863] text-white rounded-xl text-[16px] font-semibold tracking-wide transition-all shadow-md shadow-[#8c9c74]/20 hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  Payment Made
+                </button>
+              </motion.div>
+            )}
+
+            {step === "success" && (
               <motion.div
                 key="success"
                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -411,7 +457,7 @@ export default function ReservationPage() {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="text-center py-10 flex flex-col items-center justify-center h-full min-h-[400px]"
               >
-                <div className="w-24 h-24 bg-[#8c9c74]/10 rounded-full flex items-center justify-center mb-8 relative">
+                <div className="w-24 h-24 bg-[#8c9c74]/10 rounded-full flex items-center justify-center mb-8 mx-auto relative">
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -421,23 +467,19 @@ export default function ReservationPage() {
                   </motion.div>
                 </div>
                 <h2 className="text-[2rem] font-bold text-stone-900 mb-4 tracking-tight">
-                  You're All Set!
+                  Request Received!
                 </h2>
-                <p className="text-[16px] text-stone-500 mb-10 leading-relaxed max-w-[320px] mx-auto">
+                <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto">
                   Thank you,{" "}
                   <span className="font-semibold text-stone-800">
                     {formData.fullName}
                   </span>
-                  . Your reservation has been confirmed. We've sent a digital
-                  ticket to{" "}
-                  <span className="font-semibold text-stone-800">
-                    {formData.email}
-                  </span>
-                  .
+                  . Your request has been sent. You will receive a digital ticket on your email upon approval.
                 </p>
+
                 <button
                   onClick={() => {
-                    setIsSubmitted(false);
+                    setStep("form");
                     setFormData({
                       fullName: "",
                       email: "",

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Create from "./Create";
 import Bookings from "./Bookings";
+import Reservations from "./Reservations";
 
 export default function Dashboard() {
   const [active, setActive] = useState("posts");
@@ -18,6 +19,8 @@ export default function Dashboard() {
         return <Create />;
       case "bookings":
         return <Bookings />;
+      case "reservations":
+        return <Reservations />;
       default:
         return <Create />;
     }

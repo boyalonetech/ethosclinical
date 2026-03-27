@@ -15,6 +15,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: "posts", label: "Posts" },
   { id: "bookings", label: "Bookings" },
+  { id: "reservations", label: "Reservations" },
 ];
 
 export default function Sidebar({ onPageChange, activePage }: SidebarProps) {

@@ -7,6 +7,7 @@ export const db = new PocketBase(database);
 db.autoCancellation(false);
 
 export const postsCollection = db.collection('posts');
+export const reservationsCollection = db.collection('reservations');
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -137,3 +138,54 @@ export interface BookingRecord extends BookingData {
   collectionName: string;
   [key: string]: unknown;
 }
+
+// ─── Reservations ─────────────────────────────────────────────────────────────
+
+export interface ReservationData {
+  fullName: string;
+  email: string;
+  phone: string;
+  tickets: string | number;
+  needsChildcare: boolean;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  ticketId?: string;
+  [key: string]: unknown;
+}
+
+export interface ReservationRecord extends ReservationData {
+  id: string;
+  created: string;
+  updated: string;
+  collectionId: string;
+  collectionName: string;
+}
+
+export const getReservations = async (): Promise<ReservationRecord[]> => {
+  try {
+    const records = await reservationsCollection.getFullList({ sort: '-created' });
+    return records as unknown as ReservationRecord[];
+  } catch (error) {
+    console.error('Error fetching reservations:', error);
+    return [];
+  }
+};
+
+export const createReservation = async (data: Partial<ReservationData>): Promise<ReservationRecord> => {
+  try {
+    const record = await reservationsCollection.create(data);
+    return record as unknown as ReservationRecord;
+  } catch (error) {
+    console.error('Error creating reservation:', error);
+    throw error;
+  }
+};
+
+export const updateReservation = async (id: string, data: Partial<ReservationData>): Promise<ReservationRecord> => {
+  try {
+    const record = await reservationsCollection.update(id, data);
+    return record as unknown as ReservationRecord;
+  } catch (error) {
+    console.error('Error updating reservation:', error);
+    throw error;
+  }
+};
