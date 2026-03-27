@@ -27,14 +27,28 @@ export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("API Error");
+      
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      setIsSubmitting(false);
+      alert("Failed to confirm reservation. Please try again.");
+    }
   };
 
   const handleChange = (
@@ -359,7 +373,7 @@ export default function ReservationPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-stone-900 hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-3 text-[16px] group"
+                      className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-3 text-[16px] group"
                     >
                       {isSubmitting ? (
                         <>
