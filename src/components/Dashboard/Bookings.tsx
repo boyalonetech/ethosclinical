@@ -37,10 +37,10 @@ import {
   Star,
   Heart,
   ArrowRight,
-  Layers,
   Radio,
   CalendarCheck,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
 /* ─────────────────────────────────────────────
@@ -648,23 +648,33 @@ export default function AdminBookings() {
   };
 
   /* Delete */
-  const deleteBooking = async (id: string) => {
-    if (!confirm("Delete this booking permanently?")) return;
-    try {
-      setUpdating(true);
-      await db.collection("bookings").delete(id);
-      await fetchBookings();
-      if (selectedBooking?.id === id) {
-        setSelectedBooking(null);
-        setIsModalOpen(false);
+  const deleteBooking = (id: string) => {
+    toast("Delete this booking permanently?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            setUpdating(true);
+            await db.collection("bookings").delete(id);
+            await fetchBookings();
+            if (selectedBooking?.id === id) {
+              setSelectedBooking(null);
+              setIsModalOpen(false);
+            }
+            toast.success("Booking deleted successfully.");
+          } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Failed to delete booking";
+            setError(errorMessage);
+          } finally {
+            setUpdating(false);
+          }
+        }
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {}
       }
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete booking";
-      setError(errorMessage);
-    } finally {
-      setUpdating(false);
-    }
+    });
   };
 
   /* Handle booking click */

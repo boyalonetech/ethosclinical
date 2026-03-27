@@ -15,6 +15,9 @@ export async function POST(request: Request) {
     // Update the DB safely before sending
     await updateReservation(id, { status: "confirmed", ticketId });
 
+    const baseUrl = new URL(request.url).origin;
+    const ticketImageUrl = `${baseUrl}/api/ticket?name=${encodeURIComponent(fullName)}&ticketId=${ticketId}&tickets=${tickets}`;
+
     // Send the email
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -79,8 +82,8 @@ export async function POST(request: Request) {
         html: htmlContent,
         attachments: [
           {
-            filename: "Ethos_Conference_Digital_Ticket.jpg",
-            path: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1200"
+            filename: `Digital_Ticket_${ticketId}.png`,
+            path: ticketImageUrl
           }
         ]
       });

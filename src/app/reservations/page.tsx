@@ -68,7 +68,7 @@ export default function ReservationPage() {
   return (
     <div className="lg:h-screen min-h-screen lg:overflow-hidden w-full flex flex-col lg:flex-row font-sans text-stone-800 selection:bg-[#8c9c74] selection:text-white">
       {/* Left Column - Conference Details - Full Screen Height */}
-      <div className="w-full lg:w-[65%] xl:w-[69%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex flex-col justify-between">
+      <div className={`w-full lg:w-[65%] xl:w-[69%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex-col justify-between ${step !== 'form' ? 'hidden lg:flex' : 'flex'}`}>
         {/* Subtle Background Elements */}
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#8c9c74]/10 blur-[120px]"></div>

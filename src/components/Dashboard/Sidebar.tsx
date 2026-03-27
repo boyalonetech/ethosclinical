@@ -20,7 +20,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Sidebar({ onPageChange, activePage }: SidebarProps) {
   return (
-    <aside className="w-55 xl:w-66 h-screen fixed left-0 border-r shadow-lg bg-white">
+    <aside className="w-64 h-full border-r shadow-lg bg-white flex flex-col">
       <h1 className="text-left text-black font-bold text-4xl p-6 border-b">
         Admin
       </h1>

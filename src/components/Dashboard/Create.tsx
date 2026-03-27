@@ -25,6 +25,8 @@ import {
   updatePost,
   PostRecord,
 } from "@/backend/server";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,55 +49,6 @@ interface BlogFormData {
   sections: Section[];
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-function Toast({
-  message,
-  type,
-  onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 3000);
-    return () => clearTimeout(t);
-  }, [onClose]);
-
-  return (
-    <div
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${
-        type === "success"
-          ? "bg-green-50 border border-green-200 text-green-800"
-          : "bg-red-50 border border-red-200 text-red-800"
-      }`}
-    >
-      {type === "success" ? (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ) : (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-            clipRule="evenodd"
-          />
-        </svg>
-      )}
-      <span className="text-sm font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-70">
-        <X size={14} />
-      </button>
-    </div>
-  );
-}
-
 // ─── Delete Confirm ───────────────────────────────────────────────────────────
 
 function DeleteConfirmPopup({
@@ -108,34 +61,39 @@ function DeleteConfirmPopup({
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] px-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-auto p-6 border border-stone-100"
+      >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-full">
-            <Trash2 size={20} className="text-red-600" />
+          <div className="p-3 bg-rose-50 rounded-full">
+            <Trash2 size={22} className="text-rose-600" />
           </div>
-          <h3 className="text-lg font-semibold text-black">Delete Post</h3>
+          <h3 className="text-[19px] font-bold text-stone-900 tracking-tight">Delete Post</h3>
         </div>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete &apos;
-          <span className="font-medium text-black">{postTitle}</span>&apos;?
-          This action cannot be undone.
+        <p className="text-stone-500 text-[15px] leading-relaxed mb-6">
+          Are you sure you want to permanently delete '
+          <span className="font-semibold text-stone-800">{postTitle}</span>'?
+          This cannot be recovered.
         </p>
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors text-black"
+            className="px-5 py-2.5 text-sm font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition active:scale-95"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-sm font-semibold rounded-xl shadow-md shadow-rose-600/20 transition flex items-center gap-2"
           >
-            Delete
+            <Trash2 size={16} /> Delete
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -149,10 +107,6 @@ export default function BlogPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingPost, setEditingPost] = useState<PostRecord | null>(null);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
   const [deletePopup, setDeletePopup] = useState<{
     postId: string;
     postTitle: string;
@@ -182,10 +136,10 @@ export default function BlogPage() {
     try {
       await deletePost(deletePopup.postId);
       await fetchPosts();
-      setToast({ message: "Post deleted successfully!", type: "success" });
+      toast.success("Post deleted successfully!");
     } catch (err) {
       console.error("Error deleting post:", err);
-      setToast({ message: "Failed to delete post", type: "error" });
+      toast.error("Failed to delete post.");
     } finally {
       setDeletePopup(null);
     }
@@ -228,14 +182,7 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+    <div className="min-h-[100dvh] bg-stone-50/30 p-4 md:p-8 lg:p-12">
 
       {deletePopup && (
         <DeleteConfirmPopup
@@ -246,24 +193,24 @@ export default function BlogPage() {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-black">Blog Management</h1>
-          {!showCreateForm && (
-            <button
-              onClick={() => {
-                setEditingPost(null);
-                setShowCreateForm(true);
-              }}
-              className="px-4 py-2 bg-[#8e9867] hover:bg-[#6b7348] text-white rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Plus size={18} /> Create New Post
-            </button>
-          )}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">Blog Management</h2>
         </div>
+        {!showCreateForm && (
+          <button
+            onClick={() => {
+              setEditingPost(null);
+              setShowCreateForm(true);
+            }}
+            className="self-start md:self-auto px-5 py-2.5 bg-[#8c9c74] hover:bg-[#7a8863] active:scale-95 shadow-md shadow-[#8c9c74]/20 text-white rounded-xl transition-all flex items-center gap-2 font-semibold tracking-wide text-sm"
+          >
+            <Plus size={18} /> Create New Post
+          </button>
+        )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="w-full">
         {showCreateForm ? (
           <>
             <div className="mb-8">
@@ -281,25 +228,25 @@ export default function BlogPage() {
             <CreatePostForm
               postToEdit={editingPost}
               onSuccess={handleCloseForm}
-              showToast={setToast}
             />
           </>
         ) : posts.length === 0 ? (
-          <div className="text-center py-24 bg-gray-50 rounded-xl">
-            <p className="text-gray-400 mb-4">No blog posts yet</p>
+          <div className="text-center py-24 bg-stone-50 rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center">
+            <Layout size={48} className="text-stone-300 mb-4" strokeWidth={1} />
+            <p className="text-stone-500 mb-6 max-w-sm">You haven't published any blog posts yet. Eager audiences are waiting!</p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="px-4 py-2 bg-[#8e9867] text-white rounded-lg inline-flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#8c9c74] hover:bg-[#7a8863] transition active:scale-95 shadow-md shadow-[#8c9c74]/20 text-white rounded-xl inline-flex items-center gap-2 font-semibold tracking-wide"
             >
               <Plus size={18} /> Create Your First Post
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="group bg-white relative rounded-xl shadow-md border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all overflow-hidden"
+                className="group bg-white relative rounded-2xl shadow-sm border border-stone-200 hover:border-stone-300 hover:shadow-xl transition-all overflow-hidden flex flex-col h-full"
               >
                 {/* Use plain <img> — avoids Next.js domain whitelist requirement */}
                 {post.image && (
@@ -348,23 +295,25 @@ export default function BlogPage() {
                     </div>
                   </div>
 
-                  <h2 className="text-2xl font-bold line-clamp-2 text-black mb-3 hover:text-[#8e9867] transition-colors">
+                  <h2 className="text-xl md:text-2xl font-bold line-clamp-2 text-stone-900 mb-3 group-hover:text-[#8c9c74] transition-colors leading-[1.2]">
                     {post.title}
                   </h2>
                   {post.subtitle && (
-                    <p className="text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-stone-500 font-medium line-clamp-2 mb-3 text-sm">
                       {post.subtitle}
                     </p>
                   )}
-                  <p className="text-gray-700 mb-6 line-clamp-3">
+                  <p className="text-stone-600 mb-12 line-clamp-3 leading-relaxed text-sm md:text-base">
                     {post.excerpt}
                   </p>
-                  <button
-                    onClick={() => router.push(`/blog/${post.id}`)}
-                    className="text-[#8e9867] absolute bottom-3 font-medium hover:text-[#6b7348] transition-colors inline-flex items-center gap-1"
-                  >
-                    Read More →
-                  </button>
+                  <div className="absolute bottom-0 left-0 w-full p-8 pt-0 mt-auto">
+                    <button
+                      onClick={() => router.push(`/blog/${post.id}`)}
+                      className="text-[#8c9c74] font-bold tracking-wide hover:text-[#7a8863] transition-colors inline-flex items-center gap-1.5 active:scale-95"
+                    >
+                      Read More <ArrowLeft size={16} className="rotate-180" />
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -380,11 +329,9 @@ export default function BlogPage() {
 function CreatePostForm({
   postToEdit,
   onSuccess,
-  showToast,
 }: {
   postToEdit?: PostRecord | null;
   onSuccess: () => void;
-  showToast: (toast: { message: string; type: "success" | "error" }) => void;
 }) {
   const [formData, setFormData] = useState<BlogFormData>({
     category: "",
@@ -580,23 +527,17 @@ function CreatePostForm({
 
       if (postToEdit) {
         await updatePost(postToEdit.id, payload);
-        showToast({
-          message: "Blog post updated successfully!",
-          type: "success",
-        });
+        toast.success("Blog post updated successfully!");
       } else {
         await createPost(payload);
-        showToast({
-          message: "Blog post created successfully!",
-          type: "success",
-        });
+        toast.success("Blog post created successfully!");
       }
 
       onSuccess();
     } catch (err) {
       console.error("Error saving post:", err);
       setError("Failed to save blog post. Please try again.");
-      showToast({ message: "Failed to save blog post", type: "error" });
+      toast.error("Failed to save blog post");
     } finally {
       setLoading(false);
     }
