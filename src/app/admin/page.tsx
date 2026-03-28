@@ -10,6 +10,15 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  React.useEffect(() => {
+    const loggedIn = localStorage.getItem("isAdminLoggedIn");
+    if (loggedIn === "true") {
+      setIsAuthenticated(true);
+    }
+    setIsInitializing(false);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +28,7 @@ export default function AdminPage() {
     const res = await checkAdminCredentials(username, password);
 
     if (res.success) {
+      localStorage.setItem("isAdminLoggedIn", "true");
       setIsAuthenticated(true);
     } else {
       setError(res.error || "Invalid credentials");
@@ -27,8 +37,19 @@ export default function AdminPage() {
     setLoading(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("isAdminLoggedIn");
+    setIsAuthenticated(false);
+    setUsername("");
+    setPassword("");
+  };
+
+  if (isInitializing) {
+    return null; // Or a loading spinner
+  }
+
   if (isAuthenticated) {
-    return <Dashboard />;
+    return <Dashboard onLogout={handleLogout} />;
   }
 
   return (

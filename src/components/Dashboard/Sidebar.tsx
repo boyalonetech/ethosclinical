@@ -6,6 +6,7 @@ import { FileText, CalendarCheck, CalendarDays, LogOut, Shield } from "lucide-re
 interface SidebarProps {
   onPageChange: (page: string) => void;
   activePage: string;
+  onLogout: () => void;
 }
 
 const NAV_ITEMS = [
@@ -14,7 +15,7 @@ const NAV_ITEMS = [
   { id: "reservations", label: "Reservations", icon: CalendarDays },
 ];
 
-export default function Sidebar({ onPageChange, activePage }: SidebarProps) {
+export default function Sidebar({ onPageChange, activePage, onLogout }: SidebarProps) {
   return (
     <aside className="w-[280px] h-full border-r border-gray-300 bg-white flex flex-col">
       {/* Brand area */}
@@ -58,7 +59,10 @@ export default function Sidebar({ onPageChange, activePage }: SidebarProps) {
 
       {/* Footer / Logout */}
       <div className="p-4 md:p-6 border-t border-gray-50 mt-auto">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group">
+        <button 
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group"
+        >
           <LogOut size={18} className="text-gray-400 group-hover:text-red-500 transition-colors" />
           Logout
         </button>
