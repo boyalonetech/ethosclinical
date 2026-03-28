@@ -136,7 +136,7 @@ function HowItWorks() {
   return (
     <section className="bg-mint hidden lg:block py-14 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
-        <p className="text-mint-200 text-xs uppercase tracking-widest font-semibold mb-3">
+        <p className="text-white text-xs uppercase tracking-widest font-semibold mb-3">
           Process
         </p>
         <h2
@@ -149,11 +149,11 @@ function HowItWorks() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {STEPS.map(({ num, title, desc }) => (
             <div key={num} className="flex flex-col gap-3">
-              <span className="text-5xl font-bold text-mint-400 leading-none">
+              <span className="text-5xl font-bold text-white leading-none">
                 {num}
               </span>
               <h3 className="text-white font-semibold text-base">{title}</h3>
-              <p className="text-mint-100 text-sm leading-relaxed">{desc}</p>
+              <p className="text-white/70 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>

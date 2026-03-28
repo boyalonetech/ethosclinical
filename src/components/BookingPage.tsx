@@ -21,7 +21,7 @@ import {
   Layers,
   Radio,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // Constants with actual Lucide icons
 const SESSION_TYPES = [
@@ -83,6 +83,13 @@ export default function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [error]);
 
   const [form, setForm] = useState<BookingFormState>({
     firstName: "",
@@ -129,7 +136,6 @@ export default function BookingForm() {
         preferredDate,
         alternateDate: alternateDate || "",
         preferredTimeSlot: selectedSlot,
-        status: "pending",
         createdAt: new Date().toISOString(),
       };
 
@@ -198,7 +204,10 @@ export default function BookingForm() {
 
           {/* Error message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div
+              ref={errorRef}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+            >
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
@@ -588,7 +597,7 @@ export default function BookingForm() {
       {/* Backdrop */}
       <div
         onClick={() => setShowSidebar(false)}
-        className="fixed inset-0 z-40 transition-all duration-300"
+        className="fixed inset-0 z-70 transition-all duration-300"
         style={{
           backgroundColor: showSidebar ? "rgba(0,0,0,0.45)" : "transparent",
           pointerEvents: showSidebar ? "auto" : "none",

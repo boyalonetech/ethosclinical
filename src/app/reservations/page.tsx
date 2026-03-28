@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
   MapPin,
   Phone,
   Mail,
-  User,
   Heart,
   Baby,
   Coffee,
@@ -31,7 +31,7 @@ export default function ReservationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const res = await fetch("/api/reservations", {
         method: "POST",
@@ -42,7 +42,7 @@ export default function ReservationPage() {
       });
 
       if (!res.ok) throw new Error("API Error");
-      
+
       setIsSubmitting(false);
       setStep("payment");
     } catch (error) {
@@ -68,7 +68,9 @@ export default function ReservationPage() {
   return (
     <div className="lg:h-screen min-h-screen lg:overflow-hidden w-full flex flex-col lg:flex-row font-sans text-stone-800 selection:bg-[#8c9c74] selection:text-white">
       {/* Left Column - Conference Details - Full Screen Height */}
-      <div className={`w-full lg:w-[65%] xl:w-[69%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex-col justify-between ${step !== 'form' ? 'hidden lg:flex' : 'flex'}`}>
+      <div
+        className={`w-full lg:w-[65%] xl:w-[69%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex-col justify-between ${step !== "form" ? "hidden lg:flex" : "flex"}`}
+      >
         {/* Subtle Background Elements */}
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#8c9c74]/10 blur-[120px]"></div>
@@ -122,14 +124,14 @@ export default function ReservationPage() {
 
               <div>
                 <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-stone-400 mb-3 border-b border-stone-200/80 pb-3">
-                  You'll Learn
+                  You&apos;ll Learn
                 </h3>
                 <p className="text-stone-600 leading-relaxed text-[15px]">
                   Gain practical tools to navigate financial and emotional
                   stress as a team. Discover renewed insights into healthy
                   intimacy and communication strategies to sustain connection
-                  amid life's pressures. Build resilient relationships grounded
-                  in love and mutual respect.
+                  amid life&apos;s pressures. Build resilient relationships
+                  grounded in love and mutual respect.
                 </p>
               </div>
             </motion.div>
@@ -147,7 +149,12 @@ export default function ReservationPage() {
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-[#e5e1db] rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border border-white shadow-sm mt-1">
-                    <User size={22} className="text-[#a8a198]" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/stephen.jpeg"
+                      alt=""
+                      className="w-full h-full rounded-full object-cover"
+                    />
                   </div>
                   <div>
                     <h4 className="text-lg font-bold text-stone-900">
@@ -162,11 +169,11 @@ export default function ReservationPage() {
 
               <blockquote className="relative pt-2">
                 <span className="absolute top-0 -left-2 text-5xl text-[#916b5a]/10 font-serif leading-none">
-                  "
+                  &quot;
                 </span>
                 <p className="italic text-stone-600 font-serif text-[19px] leading-relaxed relative z-10 pl-5 border-l-2 border-[#916b5a]/20">
-                  Strong marriages are built not by avoiding life's storms, but
-                  by learning to walk through them together.
+                  Strong marriages are built not by avoiding life&apos;s storms,
+                  but by learning to walk through them together.
                 </p>
               </blockquote>
             </motion.div>
@@ -234,9 +241,11 @@ export default function ReservationPage() {
                 {/* Conference Hall Banner */}
                 <div className="w-full aspect-video rounded-[1.25rem] overflow-hidden mb-10 shadow-sm border border-stone-200/50 relative group">
                   <div className="absolute inset-0 bg-[#8c9c74]/10 mix-blend-multiply group-hover:opacity-0 transition-opacity duration-700 z-10 pointer-events-none"></div>
-                  <img
+                  <Image
                     src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1200"
                     alt="Beautiful Conference Hall Setup"
+                    fill
+                    unoptimized
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
                   />
                 </div>
@@ -418,24 +427,38 @@ export default function ReservationPage() {
                   Complete Payment
                 </h2>
                 <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto">
-                  To finalise your reservation, please transfer the fee of 
-                  <span className="font-bold text-stone-800"> ${formData.tickets * 400} ({formData.tickets} {formData.tickets === 1 ? 'ticket' : 'tickets'}, $400 for each couple)</span>.
+                  To finalise your reservation, please transfer the fee of
+                  <span className="font-bold text-stone-800">
+                    {" "}
+                    ${formData.tickets * 400} ({formData.tickets}{" "}
+                    {formData.tickets === 1 ? "ticket" : "tickets"}, $400 for
+                    each couple)
+                  </span>
+                  .
                 </p>
 
                 <div className="bg-stone-50/80 border border-stone-200/50 rounded-xl p-5 mb-10 w-full max-w-[340px] text-left mx-auto">
-                  <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">Payment Details</h3>
+                  <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">
+                    Payment Details
+                  </h3>
                   <div className="space-y-2 text-[14.5px]">
                     <div className="flex justify-between">
                       <span className="text-stone-500">Account Name:</span>
-                      <span className="font-semibold text-stone-800">Ethos Clinical</span>
+                      <span className="font-semibold text-stone-800">
+                        Ethos Clinical
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-stone-500">BSB:</span>
-                      <span className="font-semibold text-stone-800">123-456</span>
+                      <span className="font-semibold text-stone-800">
+                        123-456
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-stone-500">Account Number:</span>
-                      <span className="font-semibold text-stone-800">1234 5678</span>
+                      <span className="font-semibold text-stone-800">
+                        1234 5678
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -474,7 +497,8 @@ export default function ReservationPage() {
                   <span className="font-semibold text-stone-800">
                     {formData.fullName}
                   </span>
-                  . Your request has been sent. You will receive a digital ticket on your email upon approval.
+                  . Your request has been sent. You will receive a digital
+                  ticket on your email upon approval.
                 </p>
 
                 <button

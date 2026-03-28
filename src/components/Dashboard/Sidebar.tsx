@@ -1,49 +1,68 @@
 "use client";
 
 import React from "react";
+import { FileText, CalendarCheck, CalendarDays, LogOut, Shield } from "lucide-react";
 
 interface SidebarProps {
   onPageChange: (page: string) => void;
   activePage: string;
 }
 
-interface NavItem {
-  id: string;
-  label: string;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { id: "posts", label: "Posts" },
-  { id: "bookings", label: "Bookings" },
-  { id: "reservations", label: "Reservations" },
+const NAV_ITEMS = [
+  { id: "posts", label: "Posts", icon: FileText },
+  { id: "bookings", label: "Bookings", icon: CalendarCheck },
+  { id: "reservations", label: "Reservations", icon: CalendarDays },
 ];
 
 export default function Sidebar({ onPageChange, activePage }: SidebarProps) {
   return (
-    <aside className="w-64 h-full border-r shadow-lg bg-white flex flex-col">
-      <h1 className="text-left text-black font-bold text-4xl p-6 border-b">
-        Admin
-      </h1>
+    <aside className="w-[280px] h-full border-r border-gray-300 bg-white flex flex-col">
+      {/* Brand area */}
+      <div className="p-6 md:p-8 flex items-center gap-3 border-b border-gray-50">
+        <div className="w-10 h-10 rounded-xl bg-mint/10 flex items-center justify-center text-mint">
+          <Shield size={20} />
+        </div>
+        <div>
+          <h1 className="text-gray-900 font-bold text-xl tracking-tight leading-none">
+            Ethos
+          </h1>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1">
+            Workspace
+          </p>
+        </div>
+      </div>
 
-      <nav className="flex flex-col gap-2 p-4">
-        {NAV_ITEMS.map(({ id, label }) => (
-          <button
-            key={id}
-            className={`p-3 px-6 rounded-lg text-left transition-all duration-200 ${
-              activePage === id
-                ? "bg-mint text-white shadow-md"
-                : "bg-white/50 text-mint hover:bg-white hover:shadow-sm border border-mint/20"
-            }`}
-            onClick={() => onPageChange(id)}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Nav links */}
+      <nav className="flex-1 flex flex-col gap-2 p-4 md:p-6 pb-2">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 px-2">
+          Overview
+        </p>
+        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+          const isActive = activePage === id;
+          return (
+            <button
+              key={id}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
+                isActive
+                  ? "bg-mint text-white shadow-md shadow-mint/20"
+                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+              }`}
+              onClick={() => onPageChange(id)}
+            >
+              <Icon size={18} className={isActive ? "text-white" : "text-gray-400"} />
+              {label}
+            </button>
+          );
+        })}
+      </nav>
 
-        <button className="p-3 px-6 rounded-lg text-left text-red-500 hover:bg-red-50 transition-all duration-200 mt-4 border border-red-200">
+      {/* Footer / Logout */}
+      <div className="p-4 md:p-6 border-t border-gray-50 mt-auto">
+        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group">
+          <LogOut size={18} className="text-gray-400 group-hover:text-red-500 transition-colors" />
           Logout
         </button>
-      </nav>
+      </div>
     </aside>
   );
 }

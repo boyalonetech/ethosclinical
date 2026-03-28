@@ -26,7 +26,7 @@ import {
   PostRecord,
 } from "@/backend/server";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ function DeleteConfirmPopup({
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] px-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -72,12 +72,14 @@ function DeleteConfirmPopup({
           <div className="p-3 bg-rose-50 rounded-full">
             <Trash2 size={22} className="text-rose-600" />
           </div>
-          <h3 className="text-[19px] font-bold text-stone-900 tracking-tight">Delete Post</h3>
+          <h3 className="text-[19px] font-bold text-stone-900 tracking-tight">
+            Delete Post
+          </h3>
         </div>
         <p className="text-stone-500 text-[15px] leading-relaxed mb-6">
-          Are you sure you want to permanently delete '
-          <span className="font-semibold text-stone-800">{postTitle}</span>'?
-          This cannot be recovered.
+          Are you sure you want to permanently delete &apos;
+          <span className="font-semibold text-stone-800">{postTitle}</span>
+          &apos;? This cannot be recovered.
         </p>
         <div className="flex justify-end gap-3 pt-2">
           <button
@@ -183,7 +185,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-[100dvh] bg-stone-50/30 p-4 md:p-8 lg:p-12">
-
       {deletePopup && (
         <DeleteConfirmPopup
           postTitle={deletePopup.postTitle}
@@ -195,7 +196,9 @@ export default function BlogPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">Blog Management</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">
+            Blog Management
+          </h2>
         </div>
         {!showCreateForm && (
           <button
@@ -233,7 +236,10 @@ export default function BlogPage() {
         ) : posts.length === 0 ? (
           <div className="text-center py-24 bg-stone-50 rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center">
             <Layout size={48} className="text-stone-300 mb-4" strokeWidth={1} />
-            <p className="text-stone-500 mb-6 max-w-sm">You haven't published any blog posts yet. Eager audiences are waiting!</p>
+            <p className="text-stone-500 mb-6 max-w-sm">
+              You haven&apos;t published any blog posts yet. Eager audiences are
+              waiting!
+            </p>
             <button
               onClick={() => setShowCreateForm(true)}
               className="px-5 py-2.5 bg-[#8c9c74] hover:bg-[#7a8863] transition active:scale-95 shadow-md shadow-[#8c9c74]/20 text-white rounded-xl inline-flex items-center gap-2 font-semibold tracking-wide"
@@ -242,20 +248,20 @@ export default function BlogPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="flex flex-col gap-6">
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="group bg-white relative rounded-2xl shadow-sm border border-stone-200 hover:border-stone-300 hover:shadow-xl transition-all overflow-hidden flex flex-col h-full"
+                className="group bg-white relative rounded-2xl shadow-sm border border-stone-200 hover:border-stone-300 hover:shadow-xl transition-all overflow-hidden flex flex-col sm:flex-row min-h-[240px]"
               >
                 {/* Use plain <img> — avoids Next.js domain whitelist requirement */}
                 {post.image && (
-                  <div className="relative h-64 overflow-hidden">
+                  <div className="relative h-56 sm:h-auto sm:w-64 md:w-80 shrink-0 overflow-hidden border-b sm:border-b-0 sm:border-r border-stone-100 bg-stone-50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "https://placehold.co/1200x800?text=Image+Not+Found";
@@ -264,7 +270,7 @@ export default function BlogPage() {
                   </div>
                 )}
 
-                <div className="p-8">
+                <div className="p-6 md:p-7 flex flex-col flex-grow w-full">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-medium text-[#8e9867] bg-[#8e9867]/10 px-3 py-1 rounded-full">
                       {post.category}
@@ -295,21 +301,21 @@ export default function BlogPage() {
                     </div>
                   </div>
 
-                  <h2 className="text-xl md:text-2xl font-bold line-clamp-2 text-stone-900 mb-3 group-hover:text-[#8c9c74] transition-colors leading-[1.2]">
+                  <h2 className="text-xl md:text-2xl font-bold line-clamp-2 text-stone-900 mb-2 group-hover:text-[#8c9c74] transition-colors leading-[1.2]">
                     {post.title}
                   </h2>
                   {post.subtitle && (
-                    <p className="text-stone-500 font-medium line-clamp-2 mb-3 text-sm">
+                    <p className="text-stone-500 hidden font-medium line-clamp-1 mb-3 text-[13px] md:text-sm">
                       {post.subtitle}
                     </p>
                   )}
-                  <p className="text-stone-600 mb-12 line-clamp-3 leading-relaxed text-sm md:text-base">
+                  <p className="text-stone-600 mb-6 line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
                     {post.excerpt}
                   </p>
-                  <div className="absolute bottom-0 left-0 w-full p-8 pt-0 mt-auto">
+                  <div className="mt-auto pt-4 flex justify-end">
                     <button
                       onClick={() => router.push(`/blog/${post.id}`)}
-                      className="text-[#8c9c74] font-bold tracking-wide hover:text-[#7a8863] transition-colors inline-flex items-center gap-1.5 active:scale-95"
+                      className="text-[#8c9c74] font-bold tracking-wide hover:text-[#7a8863] transition-colors inline-flex items-center gap-1.5 active:scale-95 text-sm"
                     >
                       Read More <ArrowLeft size={16} className="rotate-180" />
                     </button>
@@ -654,7 +660,9 @@ function CreatePostForm({
           {formData.title || "Untitled Post"}
         </h1>
         {formData.subtitle && (
-          <p className="text-xl text-gray-600 mb-6">{formData.subtitle}</p>
+          <p className="text-xl hidden text-gray-600 mb-6">
+            {formData.subtitle}
+          </p>
         )}
         <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
           <span className="flex items-center gap-2">
@@ -768,7 +776,7 @@ function CreatePostForm({
       )}
 
       {/* Meta Info Grid */}
-      <div className="grid md:grid-cols-2 gap-8 pb-12 border-b border-gray-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 pb-12 border-b border-gray-100">
         <div className="space-y-6">
           <div>
             <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -807,7 +815,22 @@ function CreatePostForm({
             />
           </div>
 
-          <div>
+                    <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              Subtitle
+            </label>
+            <textarea
+              value={formData.excerpt}
+              onChange={(e) =>
+                setFormData({ ...formData, excerpt: e.target.value })
+              }
+              className="w-full px-0 py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all min-h-[80px] text-black resize-none"
+              placeholder="Write a brief description"
+              required
+            />
+          </div>
+
+          <div className="hidden">
             <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
               Subtitle
             </label>
@@ -824,22 +847,9 @@ function CreatePostForm({
         </div>
 
         <div className="space-y-6">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Excerpt
-            </label>
-            <textarea
-              value={formData.excerpt}
-              onChange={(e) =>
-                setFormData({ ...formData, excerpt: e.target.value })
-              }
-              className="w-full px-0 py-2 bg-transparent border-0 border-b-2 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all min-h-[80px] text-black resize-none"
-              placeholder="Write a brief description"
-              required
-            />
-          </div>
 
-          <div className="grid grid-cols-2 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                 Author
@@ -872,7 +882,7 @@ function CreatePostForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                 Date
@@ -936,7 +946,7 @@ function CreatePostForm({
 
       {activeTab === "write" ? (
         <div className="space-y-6">
-          <div className="flex gap-2 py-4 border-b sticky top-0 z-60 bg-white border-gray-100">
+          <div className="flex flex-wrap gap-2 py-4 border-b sticky top-0 z-60 bg-white border-gray-100 pb-4">
             {(
               [
                 {
@@ -1018,18 +1028,18 @@ function CreatePostForm({
       )}
 
       {/* Actions */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-100 mt-8 py-4 flex justify-end gap-3">
+      <div className="sticky bottom-0 bg-white border-t border-gray-100 mt-8 py-4 flex flex-col sm:flex-row justify-end gap-3 px-2 sm:px-0">
         <button
           type="button"
           onClick={onSuccess}
-          className="px-6 py-2 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors text-black"
+          className="w-full sm:w-auto px-6 py-3 sm:py-2 border border-stone-200 rounded-xl hover:border-stone-300 transition-colors text-stone-700 font-semibold"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-[#8e9867] hover:bg-[#6b7348] text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-[#8c9c74] hover:bg-[#7a8863] shadow-md shadow-[#8c9c74]/20 active:scale-95 text-white rounded-xl transition-all disabled:opacity-50 flex justify-center items-center gap-2 font-semibold tracking-wide text-sm"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Saving..." : postToEdit ? "Update Post" : "Create Post"}

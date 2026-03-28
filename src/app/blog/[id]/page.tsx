@@ -63,6 +63,9 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     loadPost();
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, [loadPost]); // Now loadPost is included in dependency array
 
   const showToast = (message: string) => {
