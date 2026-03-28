@@ -42,6 +42,22 @@ export const TESTIMONIALS = [
     role: "Organisation Partner",
     color: "bg-mint text-white rotate-25 ml-6",
   },
+  {
+    quote:
+      "The reflective framework used in supervision has helped me approach challenging situations with greater clarity and confidence. It's made a real difference in how I practise.",
+    name: "Michael O'Connor",
+    role: "NDIS Support Coordinator",
+    color: "bg-brown text-white -rotate-25 ml-6",
+  },
+
+  {
+    quote:
+      "Ethos gave me the space to reflect on complex cases and strengthened my decision-making in challenging work.",
+    name: "Sarah Mitchell",
+    role: `Senior Caseworker, 
+Out-of-Home Care`,
+    color: "bg-mint text-white rotate-25 ml-6",
+  },
 ];
 
 export const FAQS = [

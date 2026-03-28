@@ -215,13 +215,15 @@ export default function Testimonials() {
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-white/5 overflow-hidden shrink-0 ring-2 ring-white/20">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`https://images.unsplash.com/photo-${
+                      src={`${
                         [
-                          "1560250097-0b93528c311a",
-                          "1573497161161-c3e73707e25c",
-                          "1551836022-deb4988cc6c0",
-                        ][i % 3]
-                      }?w=100&q=80`}
+                          "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80",
+                          "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?w=100&q=80",
+                          "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=100&q=80",
+                          "/test2.jpg",
+                          "/test3.jpg",
+                        ][i % 5]
+                      }`}
                       alt={name}
                       className="w-full h-full object-cover"
                     />
