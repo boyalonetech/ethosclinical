@@ -11,16 +11,25 @@ export async function POST(request: Request) {
       fullName,
       email,
       phone,
-      tickets,
+      tickets: Number(tickets),
       needsChildcare,
       status: 'pending'
     });
 
     return NextResponse.json({ success: true, id: created.id });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Booking API error:", error);
+    let errorMessage = error?.response?.message || error?.message || "Failed to process reservation";
+    
+    if (error?.response?.data && Object.keys(error.response.data).length > 0) {
+      const validationErrs = Object.entries(error.response.data)
+        .map(([field, err]: any) => `${field}: ${err.message}`)
+        .join('; ');
+      errorMessage = `Validation error: ${validationErrs}`;
+    }
+
     return NextResponse.json(
-      { error: "Failed to process reservation" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
