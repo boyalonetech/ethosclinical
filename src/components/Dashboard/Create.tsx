@@ -275,7 +275,7 @@ export default function BlogPage() {
                     <span className="text-xs font-medium text-[#8e9867] bg-[#8e9867]/10 px-3 py-1 rounded-full">
                       {post.category}
                     </span>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2  transition-opacity">
                       <button
                         onClick={() => {
                           setEditingPost(post);
