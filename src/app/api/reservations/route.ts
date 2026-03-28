@@ -17,13 +17,14 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, id: created.id });
-  } catch (error: any) {
-    console.error("Booking API error:", error);
-    let errorMessage = error?.response?.message || error?.message || "Failed to process reservation";
+  } catch (error: unknown) {
+    const pbError = error as { response?: { message?: string, data?: Record<string, { message: string }> }, message?: string };
+    console.error("Booking API error:", pbError);
+    let errorMessage = pbError?.response?.message || pbError?.message || "Failed to process reservation";
     
-    if (error?.response?.data && Object.keys(error.response.data).length > 0) {
-      const validationErrs = Object.entries(error.response.data)
-        .map(([field, err]: any) => `${field}: ${err.message}`)
+    if (pbError?.response?.data && Object.keys(pbError.response.data).length > 0) {
+      const validationErrs = Object.entries(pbError.response.data)
+        .map(([field, err]) => `${field}: ${err.message}`)
         .join('; ');
       errorMessage = `Validation error: ${validationErrs}`;
     }

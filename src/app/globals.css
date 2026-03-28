@@ -30,11 +30,6 @@
   }
 }
 
-body {
-  /* font-family: Arial, Helvetica, sans-serif; */
-  border-color: #ffffff;
-}
-
 /* Add these custom animations to your global CSS file (e.g., globals.css) */
 @keyframes pulse-slow {
   0%,
@@ -59,4 +54,48 @@ body {
 .section {
   position: sticky;
   top: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #78716c;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #57534e;
+  transform: scale(1.2);
 }

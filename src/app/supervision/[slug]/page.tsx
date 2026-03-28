@@ -88,8 +88,8 @@ const SUPERVISION_DETAILS: SupervisionDetailsMap = {
       "Trauma specialists, crisis workers, mental health clinicians, first responders",
     imagePath: "/super3.jpg",
   },
-  "leadership-executive-consultation": {
-    slug: "leadership-executive-consultation",
+  "leadership-and-executive-consultation": {
+    slug: "leadership-and-executive-consultation",
     bullets: [
       "Navigate ethical complexities in leadership roles",
       "Maintain clinical integrity while managing systems",
@@ -116,21 +116,22 @@ const SUPERVISION_DETAILS: SupervisionDetailsMap = {
 
 // Helper function to convert title to slug
 const titleToSlug = (title: string): string => {
-  return title.toLowerCase().replace(/\s+/g, "-");
+  return title.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-");
 };
 
 export default function SupervisionDetailPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const rawSlug = params.slug as string;
+  const normalizedSlug = titleToSlug(decodeURIComponent(rawSlug || ""));
 
   // Find the supervision type that matches the slug
   const supervisionType = SUPERVISION_TYPES.find(
-    (type: SupervisionType) => titleToSlug(type.title) === slug,
+    (type: SupervisionType) => titleToSlug(type.title) === normalizedSlug,
   );
   const router = useRouter();
 
 
-  const details = SUPERVISION_DETAILS[slug];
+  const details = SUPERVISION_DETAILS[normalizedSlug];
 
   if (!supervisionType || !details) {
     return (
@@ -225,7 +226,7 @@ export default function SupervisionDetailPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {SUPERVISION_TYPES.filter(
-              (type: SupervisionType) => titleToSlug(type.title) !== slug,
+              (type: SupervisionType) => titleToSlug(type.title) !== normalizedSlug,
             ).map(
               ({
                 icon: CardIcon,

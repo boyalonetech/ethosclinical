@@ -43,7 +43,7 @@ export default function CTABanner() {
             <button
               onClick={() =>
                 typeof window !== "undefined" &&
-                (window.location.href = "/contact")
+                (window.location.href = "/book")
               }
               className="bg-mint hover:bg-brown text-white text-sm font-medium px-6 py-3.5 rounded-md transition-colors inline-flex items-center gap-2"
             >

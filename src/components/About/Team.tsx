@@ -32,7 +32,7 @@ export default function Team() {
         </h2>
 
         {/* Mobile: horizontal scroll, Desktop: grid */}
-        <div className="overflow-x-auto lg:overflow-visible">
+        <div className="overflow-x-auto lg:overflow-hidden">
           <div className="flex lg:grid lg:grid-cols-4 xl:grid-cols-4 gap-6 items-start w-max lg:w-full">
             {teamMembers.map((member, index) => (
               <div
@@ -49,7 +49,7 @@ export default function Team() {
                 </picture>
 
                 {/* Text overlay - visible on hover */}
-                <div className="absolute inset-0 bg-white shadow-llg border flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                <div className="absolute scale-110 inset-0 bg-white shadow-lg flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                   <h3 className="text-black text-2xl font-semibold mb-2 font-['Bona_Nova',serif]">
                     {member.name}
                   </h3>

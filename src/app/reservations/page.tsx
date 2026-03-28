@@ -52,11 +52,11 @@ export default function ReservationPage() {
 
       setIsSubmitting(false);
       setStep("success");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setIsSubmitting(false);
       toast.error(
-        error?.message || "Failed to confirm payment. Please try again.",
+        (error as Error)?.message || "Failed to confirm payment. Please try again.",
       );
     }
   };

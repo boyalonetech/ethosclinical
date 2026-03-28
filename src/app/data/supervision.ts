@@ -1,5 +1,13 @@
 // app/data/supervision.ts
-import { Users, UserRound, Building2, Brain, Crown, Globe, LucideIcon } from "lucide-react";
+import {
+  Users,
+  UserRound,
+  Building2,
+  Brain,
+  Crown,
+  Globe,
+  LucideIcon,
+} from "lucide-react";
 
 export interface SupervisionType {
   icon: LucideIcon;
@@ -30,7 +38,7 @@ export const SUPERVISION_TYPES: SupervisionType[] = [
   },
   {
     icon: Crown,
-    title: "Leadership & Executive Consultation",
+    title: "Leadership and Executive Consultation",
     desc: "For leaders making high-stakes decisions in complex systems. Clinical supervision isn't just for frontline staff — leaders benefit from space to reflect, recharge, and lead ethically.",
   },
   {

@@ -4,10 +4,14 @@ import { updateReservation } from "@/backend/server";
 
 export async function POST(request: Request) {
   try {
-    const { id, fullName, email, tickets, needsChildcare } = await request.json();
+    const { id, fullName, email, tickets, needsChildcare } =
+      await request.json();
 
     if (!id || !email) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     const ticketId = `TCK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
@@ -54,7 +58,7 @@ export async function POST(request: Request) {
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #777777; font-size: 14px;">Date & Time</td>
-                <td style="padding: 8px 0; text-align: right; font-weight: bold; color: #333;">Fri 24th April, 2026<br/>7:00pm - 9:00pm</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: bold; color: #333;">Fri 24th April, 2026<br/>7:00pm - 9:30pm</td>
               </tr>
             </table>
           </div>
@@ -83,9 +87,9 @@ export async function POST(request: Request) {
         attachments: [
           {
             filename: `Digital_Ticket_${ticketId}.png`,
-            path: ticketImageUrl
-          }
-        ]
+            path: ticketImageUrl,
+          },
+        ],
       });
       console.log("Ticket email sent to", email);
     } else {
