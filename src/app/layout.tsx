@@ -101,6 +101,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased text-black`}
     >
       <head>
+        <meta
+          name="google-site-verification"
+          content="gND6YmR-imjIiih5kanHrLJ-nTCEz4Ax0YK6y_b1g3w"
+        />
         <link rel="icon" type="image/png" href="/icon.ico" />
       </head>
       <body className="min-h-full flex flex-col">
