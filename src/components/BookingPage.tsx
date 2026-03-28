@@ -597,7 +597,7 @@ export default function BookingForm() {
       {/* Backdrop */}
       <div
         onClick={() => setShowSidebar(false)}
-        className="fixed inset-0 transition-all duration-300"
+        className="fixed inset-0 transition-all z-50 duration-300"
         style={{
           backgroundColor: showSidebar ? "rgba(0,0,0,0.45)" : "transparent",
           pointerEvents: showSidebar ? "auto" : "none",
@@ -646,9 +646,7 @@ export default function BookingForm() {
             <p className="text-black text-sm leading-relaxed">
               Thank you,{" "}
               <span className="font-semibold">{form.firstName || "there"}</span>
-              ! Stephen will review your request and be in touch within{" "}
-              <span className="font-semibold">24 hours</span> to confirm your
-              session.
+              ! your request has been sent and will be reviewed.
             </p>
           </div>
 
