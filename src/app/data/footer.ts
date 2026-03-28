@@ -1,7 +1,1 @@
-export const FOOTER_LINKS = [
-  "About Us",
-  "Contact Us",
-  "Bookings",
-  "Blogs",
-  "Services",
-];
+export const FOOTER_LINKS = ["About", "Contact", "Book", "Blog"];

@@ -3,12 +3,13 @@ import { NAV_LINKS } from "@/app/data/nav";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <header className="w-full bg-stone-50 relative top-0 z-50 border-b border-stone-200">
@@ -26,19 +27,22 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.name}
-              href={link.link}
-              className={`text-medium font-medium transition-colors ${
-                link.link === "home"
-                  ? "text-browwn"
-                  : "text-stone-900 hover:text-brown"
-              }`}
-            >
-              {link.name}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = pathname === link.link;
+            return (
+              <Link
+                key={link.name}
+                href={link.link}
+                className={`text-[15px] tracking-wide font-medium transition-all ${
+                  isActive
+                    ? "text-[#8d6959] underline decoration-[#8d6959] underline-offset-[6px] decoration-[2px]"
+                    : "text-stone-600 hover:text-[#8d6959]"
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* CTA */}
@@ -72,15 +76,22 @@ export default function Header() {
             className="md:hidden fixed w-full shadow  bg-stone-50 border-t border-stone-200 pt-4 px-6 pb-6 flex flex-col gap-4"
             onClick={() => setOpen(!open)}
           >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.name}
-                href={link.link}
-                className="text-stone-800 text-base font-medium py-1"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.link;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.link}
+                  className={`text-base font-medium py-1.5 transition-colors ${
+                    isActive
+                      ? "text-[#8d6959] underline decoration-[#8d6959] underline-offset-4 decoration-2"
+                      : "text-stone-800"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
             <button
               onClick={() => router.push("/book")}
               className="bg-[#8E9867] font-medium hover:bg-brown text-white text-sm font-medium px-5 py-3 rounded-md mt-2"

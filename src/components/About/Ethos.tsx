@@ -51,10 +51,10 @@ export default function EthosDifference() {
           ].map(({ icon: Icon, label, text }) => (
             <div
               key={label}
-              className="bg-mint rounded-xl p-7 flex flex-col gap-4"
+              className="bg-mint hover:bg-brown rounded-xl p-7 flex flex-col gap-4"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-lg bg-gray-100  transition-colors  duration-200 flex items-center justify-center">
                   <Icon size={16} className="text-mint" />
                 </div>
                 <h3 className="text-white text-xl font-semibold">{label}</h3>

@@ -18,12 +18,13 @@ export default function Team() {
       quote: "Small steps lead to big changes.",
     },
     {
-      name: "David Kim",
-      role: "Mental Health Advocate",
+      name: "Elvis Nwoke",
+      role: "IT Specialist",
       quote: "Your story matters, and so does your voice.",
     },
   ];
 
+  
   return (
     <section className="bg-stone-50 py-16 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
@@ -49,12 +50,12 @@ export default function Team() {
                 </picture>
 
                 {/* Text overlay - visible on hover */}
-                <div className="absolute scale-110 inset-0 bg-white shadow-lg flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                  <h3 className="text-black text-2xl font-semibold mb-2 font-['Bona_Nova',serif]">
+                <div className="absolute scale-110 inset-0 bg-brown shadow-lg flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                  <h3 className="text-white text-2xl font-semibold mb-2 font-['Bona_Nova',serif]">
                     {member.name}
                   </h3>
-                  <p className="text-black/70 text-sm mb-4">{member.role}</p>
-                  <p className="text-black text-base leading-relaxed">
+                  <p className="text-white/70 text-sm mb-4">{member.role}</p>
+                  <p className="text-white text-base leading-relaxed">
                     &apos;{member.quote}&apos;
                   </p>
                 </div>
