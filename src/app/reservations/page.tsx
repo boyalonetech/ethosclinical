@@ -28,8 +28,12 @@ export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<"form" | "payment" | "success">("form");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setStep("payment");
+  };
+
+  const handlePayment = async () => {
     setIsSubmitting(true);
 
     try {
@@ -44,11 +48,11 @@ export default function ReservationPage() {
       if (!res.ok) throw new Error("API Error");
 
       setIsSubmitting(false);
-      setStep("payment");
+      setStep("success");
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
-      toast.error("Failed to confirm reservation. Please try again.");
+      toast.error("Failed to confirm payment. Please try again.");
     }
   };
 
@@ -69,7 +73,7 @@ export default function ReservationPage() {
     <div className="lg:h-screen min-h-screen lg:overflow-hidden w-full flex flex-col lg:flex-row font-sans text-stone-800 selection:bg-[#8c9c74] selection:text-white">
       {/* Left Column - Conference Details - Full Screen Height */}
       <div
-        className={`w-full lg:w-[65%] xl:w-[69%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex-col justify-between ${step !== "form" ? "hidden lg:flex" : "flex"}`}
+        className={`w-full lg:w-[66%] xl:w-[67%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-[#F9F8F5] p-8 md:p-12 lg:p-6 lg:px-10 xl:p-14 relative flex-col justify-between ${step !== "form" ? "hidden lg:flex" : "flex"}`}
       >
         {/* Subtle Background Elements */}
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none">
@@ -227,7 +231,7 @@ export default function ReservationPage() {
       </div>
 
       {/* Right Column - Form - Full Screen Height */}
-      <div className="w-full lg:w-[42%] xl:w-[31%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-white p-8 md:p-12 lg:p-0 xl:py-0 flex flex-col relative min-h-screen lg:min-h-0 z-10">
+      <div className="w-full lg:w-[44%] xl:w-[33%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-white p-8 md:p-12 lg:p-0 xl:py-0 flex flex-col relative min-h-screen lg:min-h-0 z-10">
         <div className="max-w-[440px] w-full mx-auto my-auto py-10 lg:py-12">
           <AnimatePresence mode="wait">
             {step === "form" && (
@@ -382,23 +386,15 @@ export default function ReservationPage() {
                   <div className="pt-6 mt-6">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-3 text-[16px] group"
+                      className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 flex items-center justify-center gap-3 text-[16px] group"
                     >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Finishing...
-                        </>
-                      ) : (
-                        <>
-                          Complete Registration{" "}
-                          <ArrowRight
-                            size={18}
-                            className="group-hover:translate-x-1 transition-transform"
-                          />
-                        </>
-                      )}
+                      <>
+                        Proceed to Payment{" "}
+                        <ArrowRight
+                          size={18}
+                          className="group-hover:translate-x-1 transition-transform"
+                        />
+                      </>
                     </button>
 
                     <p className="text-center text-[13px] text-stone-400 mt-6 font-medium">
@@ -464,10 +460,18 @@ export default function ReservationPage() {
                 </div>
 
                 <button
-                  onClick={() => setStep("success")}
-                  className="w-full max-w-[340px] h-14 bg-[#8c9c74] hover:bg-[#7a8863] text-white rounded-xl text-[16px] font-semibold tracking-wide transition-all shadow-md shadow-[#8c9c74]/20 hover:shadow-lg hover:-translate-y-0.5"
+                  onClick={handlePayment}
+                  disabled={isSubmitting}
+                  className="w-full max-w-[340px] h-14 bg-[#8c9c74] hover:bg-[#7a8863] text-white rounded-xl text-[16px] font-semibold tracking-wide transition-all shadow-md shadow-[#8c9c74]/20 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
                 >
-                  Payment Made
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    "Payment Made"
+                  )}
                 </button>
               </motion.div>
             )}
