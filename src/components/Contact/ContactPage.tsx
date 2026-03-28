@@ -1,10 +1,12 @@
 "use client";
 import { CONTACT_INFO } from "@/app/data/contact";
-import { Mail, Phone, Send } from "lucide-react";
+import { Mail, Phone, Send, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ContactSection() {
   const [agreed, setAgreed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -15,6 +17,32 @@ export default function ContactSection() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agreed) return;
+    
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to send message.");
+      }
+
+      toast.success("Message sent successfully! We will get back to you shortly.");
+      setForm({ fullName: "", email: "", phone: "", message: "" });
+      setAgreed(false);
+    } catch {
+      toast.error("Failed to send your message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section className="py-10  lg:px-10 bg-stone-50">
@@ -74,7 +102,7 @@ export default function ContactSection() {
 
               <form
                 className="flex flex-col gap-6"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleSubmit}
               >
                 {/* Name + Phone row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -188,10 +216,14 @@ export default function ContactSection() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  disabled={!agreed}
-                  className="bg-mintl hover:bg-mintl disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 self-start"
+                  disabled={!agreed || isSubmitting}
+                  className="bg-mintl hover:bg-mintl disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 self-start min-w-[150px]"
                 >
-                  Send Message <Send size={15} />
+                  {isSubmitting ? (
+                    <>Sending... <Loader2 size={15} className="animate-spin" /></>
+                  ) : (
+                    <>Send Message <Send size={15} /></>
+                  )}
                 </button>
               </form>
             </div>

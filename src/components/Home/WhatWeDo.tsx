@@ -1,6 +1,9 @@
+"use client";
 import { ArrowRight, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function WhatWeDo() {
+  const router = useRouter();
   return (
     <section className="bg-stone-50 py-16 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
@@ -19,14 +22,12 @@ export default function WhatWeDo() {
                 We partner with organisations and individual practitioners
                 working in some of the most complex therapeutic
                 environments—out-of-home care, NDIS services, trauma programs,
-                and Aboriginal Community Controlled Organisations.
-                We understand the weight your teams carry: life-altering
-                decisions made before lunch, families held together while
-                navigating broken systems, and the emotional impact of
-                clients&apos; pain that often stays long after the workday ends.
-
-                Too often, supervision models reduce this complexity to a
-                checklist.{" "}
+                and Aboriginal Community Controlled Organisations. We understand
+                the weight your teams carry: life-altering decisions made before
+                lunch, families held together while navigating broken systems,
+                and the emotional impact of clients&apos; pain that often stays
+                long after the workday ends. Too often, supervision models
+                reduce this complexity to a checklist.{" "}
                 <span className="text-brown italic">
                   Case reviewed. ✓ Documentation updated. ✓ Move on.
                 </span>
@@ -64,7 +65,10 @@ export default function WhatWeDo() {
               </ul>
             </div>
 
-            <button className="mt-2 bg-mint hover:bg-mintl text-white text-sm font-medium px-5 py-3 rounded-md transition-colors self-start flex items-center gap-2">
+            <button
+              onClick={() => router.push("/about")}
+              className="mt-2 bg-mint hover:bg-mintl text-white text-sm font-medium px-5 py-3 rounded-md transition-colors self-start flex items-center gap-2"
+            >
               Learn more <ArrowRight size={16} />
             </button>
           </div>
@@ -72,7 +76,7 @@ export default function WhatWeDo() {
           {/* Right image */}
           <div className="flex-1 w-full">
             <div className="rounded-2xl overflow-hidden bg-stone-200 aspect-[3/3] w-full max-w-md mx-auto lg:mx-0 lg:max-w-none">
-              <picture >
+              <picture>
                 {" "}
                 <img
                   src="/what.jpg"
