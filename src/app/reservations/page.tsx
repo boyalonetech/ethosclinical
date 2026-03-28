@@ -55,7 +55,9 @@ export default function ReservationPage() {
     } catch (error: any) {
       console.error(error);
       setIsSubmitting(false);
-      toast.error(error?.message || "Failed to confirm payment. Please try again.");
+      toast.error(
+        error?.message || "Failed to confirm payment. Please try again.",
+      );
     }
   };
 
@@ -152,7 +154,7 @@ export default function ReservationPage() {
             >
               <div>
                 <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-stone-400 mb-3 border-b border-stone-200/80 pb-3">
-                  Keynote Speaker
+                  Convener
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-[#e5e1db] rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border border-white shadow-sm mt-1">
@@ -203,7 +205,7 @@ export default function ReservationPage() {
                 <h4 className="font-semibold text-stone-900 text-sm">
                   Fri 24th April, 2026
                 </h4>
-                <p className="text-stone-500 text-sm mt-0.5">7:00pm - 9:00pm</p>
+                <p className="text-stone-500 text-sm mt-0.5">7:00pm - 9:30pm</p>
               </div>
             </div>
             <div className="flex gap-4">
