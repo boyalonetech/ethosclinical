@@ -597,7 +597,7 @@ export default function BookingForm() {
       {/* Backdrop */}
       <div
         onClick={() => setShowSidebar(false)}
-        className="fixed inset-0 z-70 transition-all duration-300"
+        className="fixed inset-0 transition-all duration-300"
         style={{
           backgroundColor: showSidebar ? "rgba(0,0,0,0.45)" : "transparent",
           pointerEvents: showSidebar ? "auto" : "none",
