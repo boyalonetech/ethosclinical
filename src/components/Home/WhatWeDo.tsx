@@ -10,7 +10,7 @@ export default function WhatWeDo() {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
           {/* Left text */}
           <div className="flex-1 flex flex-col gap-5">
-            <p className="text-mint  text-sm font-medium uppercase tracking-widest font-['Bona_Nova',serif]">
+            <p className="text-mint  text-sm font-extrabold uppercase tracking-widest font-['Bona_Nova',serif]">
               What we do
             </p>
             <h2 className="text-3xl lg:text-3xl  text-black font-normal leading-snug font-['Geist',sans-serif] max-w-lg">

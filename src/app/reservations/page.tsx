@@ -56,7 +56,8 @@ export default function ReservationPage() {
       console.error(error);
       setIsSubmitting(false);
       toast.error(
-        (error as Error)?.message || "Failed to confirm payment. Please try again.",
+        (error as Error)?.message ||
+          "Failed to confirm payment. Please try again.",
       );
     }
   };
@@ -107,10 +108,11 @@ export default function ReservationPage() {
               Conference 2026
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-stone-900 leading-[1.1] mb-6 tracking-tight">
-              Western Sydney Faith-Based Psychosocial Mental Health Conference
+              Building Strong Marriages in Changing Times.
             </h1>
             <p className="text-xl md:text-2xl text-stone-500 font-light leading-snug max-w-2xl border-l-[3px] border-[#916b5a]/40 pl-6 rounded-sm">
-              Building Strong Marriages in Changing Times.
+              Western Sydney Faith-Based Psychosocial Mental Health
+              Conference{" "}
             </p>
           </motion.div>
 
@@ -120,29 +122,32 @@ export default function ReservationPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="space-y-10"
+              className="space-y-4"
             >
-              <div>
+              <ul>
                 <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-stone-400 mb-3 border-b border-stone-200/80 pb-3">
-                  The Theme
+                  You&apos;ll Gain
                 </h3>
-                <p className="text-[17px] font-medium text-stone-800 leading-relaxed">
-                  Faith • Intimacy • Resilience • Emotional wellbeing
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-stone-400 mb-3 border-b border-stone-200/80 pb-3">
-                  You&apos;ll Learn
-                </h3>
-                <p className="text-stone-600 leading-relaxed text-[15px]">
-                  Gain practical tools to navigate financial and emotional
-                  stress as a team. Discover renewed insights into healthy
-                  intimacy and communication strategies to sustain connection
-                  amid life&apos;s pressures. Build resilient relationships
-                  grounded in love and mutual respect.
-                </p>
-              </div>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3 text-stone-600 text-[15px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brown mt-2 flex-shrink-0" />
+                    Financial stress | Psychosocial tools for modern life
+                  </li>
+                  <li className="flex items-start gap-3 text-stone-600 text-[15px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brown mt-2 flex-shrink-0" />
+                    Work Pressure | Practical coping strategies to balance work
+                    and family demands
+                  </li>
+                  <li className="flex items-start gap-3 text-stone-600 text-[15px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brown mt-2 flex-shrink-0" />
+                    Sexuality | Stronger marital bond
+                  </li>
+                  <li className="flex items-start gap-3 text-stone-600 text-[15px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brown mt-2 flex-shrink-0" />
+                    Intimacy & faith | support within faith context
+                  </li>
+                </ul>
+              </ul>
             </motion.div>
 
             {/* Speaker & Quote */}
@@ -236,7 +241,7 @@ export default function ReservationPage() {
       </div>
 
       {/* Right Column - Form - Full Screen Height */}
-      <div className="w-full lg:w-[44%] xl:w-[33%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-white p-8 md:p-12 lg:p-0 xl:py-0 flex flex-col relative min-h-screen lg:min-h-0 z-10">
+      <div className="w-full lg:w-[44%] md:mx-4 xl:mx-0 xl:w-[33%] lg:h-screen lg:overflow-y-auto lg:overflow-x-hidden bg-white p-8 md:p-12 lg:p-0 xl:py-0 flex flex-col relative min-h-screen lg:min-h-0 z-10">
         <div className="max-w-[440px] w-full mx-auto my-auto py-10 lg:py-12">
           <AnimatePresence mode="wait">
             {step === "form" && (
@@ -394,7 +399,7 @@ export default function ReservationPage() {
                       className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 flex items-center justify-center gap-3 text-[16px] group"
                     >
                       <>
-                        Proceed to Payment{" "}
+                        Complete Registration{" "}
                         <ArrowRight
                           size={18}
                           className="group-hover:translate-x-1 transition-transform"

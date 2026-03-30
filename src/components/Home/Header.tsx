@@ -51,7 +51,7 @@ export default function Header() {
             className="bg-[#8E9867]  hover:bg-brown text-white text-sm font-[500] px-5 py-3 rounded-md transition-colors"
             onClick={() => router.push("/book")}
           >
-            Book a Counsellor
+            Book a Supervisor
           </button>
         </div>
 
@@ -96,7 +96,7 @@ export default function Header() {
               onClick={() => router.push("/book")}
               className="bg-[#8E9867] font-medium hover:bg-brown text-white text-sm font-medium px-5 py-3 rounded-md mt-2"
             >
-              Book a Counsellor
+              Book a Supervisor
             </button>
           </div>
         </>

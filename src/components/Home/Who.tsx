@@ -5,7 +5,7 @@ export default function WhoWeAre() {
     <section className="bg-stone-50 py-16 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         <div className="max-w-4xl mx-auto flex flex-col gap-5">
-          <p className="text-mint text-sm font-medium uppercase tracking-widest">
+          <p className="text-mint text-sm font-extrabold uppercase tracking-widest">
             About Us
           </p>
           <h2 className="text-4xl lg:text-5xl font-normal text-stone-900 font-['Bona_Nova',serif] tracking-tight">

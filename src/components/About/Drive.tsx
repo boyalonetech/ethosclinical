@@ -8,7 +8,7 @@ export function DrivesAndApproach() {
         {/* What Drives Stephen */}
         <div className="flex flex-col gap-5">
           <h2 className="text-2xl font-normal text-mint">
-            What Drives Stephen&apos;s Work
+            What Drives ECS&apos;s Work
           </h2>
           <ul className="flex flex-col gap-3">
             {DRIVES.map((item, i) => (
@@ -30,9 +30,7 @@ export function DrivesAndApproach() {
 
         {/* Stephen's Approach */}
         <div className="flex flex-col gap-5">
-          <h2 className="text-2xl font-normal text-mint">
-            Stephen&apos;s Approach
-          </h2>
+          <h2 className="text-2xl font-normal text-mint">Our Approach</h2>
           <ul className="flex flex-col gap-3">
             {APPROACHES.map((item, i) => (
               <li

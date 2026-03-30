@@ -54,7 +54,9 @@ export default function Footer() {
               {FOOTER_LINKS.map((link) => (
                 <li key={link}>
                   <a
-                    href={link.toLocaleLowerCase()}
+                    href={
+                      link === "Booking" ? "/book" : link.toLocaleLowerCase()
+                    }
                     className="text-stone-600 text-sm hover:text-stone-900 transition-colors flex items-center gap-1.5"
                   >
                     <ChevronRight size={12} className="text-stone-400" />
