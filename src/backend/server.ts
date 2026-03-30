@@ -147,6 +147,8 @@ export interface ReservationData {
   phone: string;
   tickets: string | number;
   needsChildcare: boolean;
+  makeDonation: boolean;
+  donationAmount: number;
   status: 'pending' | 'confirmed' | 'cancelled';
   ticketId?: string;
   [key: string]: unknown;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db } from "@/backend/server";
+import PocketBase from "pocketbase";
 import {
   CheckCircle2,
   Trash2,
@@ -15,6 +15,10 @@ import {
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
+const database = process.env.NEXT_PUBLIC_DATABASE_API || 'http://127.0.0.1:8090';
+const db = new PocketBase(database);
+db.autoCancellation(false);
+
 interface Reservation {
   id: string;
   fullName: string;
@@ -22,7 +26,9 @@ interface Reservation {
   phone: string;
   tickets: string | number;
   needsChildcare: boolean;
-  status: "pending" | "confirmed" | "cancelled";
+  makeDonation: boolean;
+  donationAmount: number;
+  status: "confirmed" | "cancelled";
   ticketId?: string;
   createdAt: string;
 }
@@ -51,6 +57,8 @@ export default function AdminReservations() {
           phone: r.phone,
           tickets: r.tickets,
           needsChildcare: r.needsChildcare,
+          makeDonation: r.makeDonation || false,
+          donationAmount: r.donationAmount || 0,
           status: r.status,
           ticketId: r.ticketId,
           createdAt: r.created,
@@ -68,37 +76,6 @@ export default function AdminReservations() {
     fetchReservations();
   }, []);
 
-  const confirmReservation = (res: Reservation) => {
-    setConfirmAction({
-      title: "Confirm & Dispatch Ticket?",
-      message: `Are you sure you want to approve ${res.fullName}? An official digital ticket will be instantly generated and emailed to them.`,
-      onConfirm: async () => {
-        try {
-          setUpdating(true);
-          const req = await fetch("/api/reservations/confirm", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: res.id,
-              fullName: res.fullName,
-              email: res.email,
-              tickets: res.tickets,
-              needsChildcare: res.needsChildcare,
-            }),
-          });
-          if (!req.ok) throw new Error("API Failed");
-          await fetchReservations();
-          toast.success(`Ticket dispatched to ${res.email}!`);
-        } catch (err) {
-          console.error(err);
-          toast.error("Error confirming reservation.");
-        } finally {
-          setUpdating(false);
-        }
-      },
-    });
-  };
-
   const cancelReservation = async (res: Reservation) => {
     setConfirmAction({
       title: "Cancel Reservation?",
@@ -106,16 +83,28 @@ export default function AdminReservations() {
       onConfirm: async () => {
         try {
           setUpdating(true);
+
+          // Update status immediately from the client dashboard
+          try {
+            await db.collection("reservations").update(res.id, { status: "cancelled" });
+          } catch(updateErr) {
+             console.warn("Pocketbase direct update issue. Proceeding to email dispatch.", updateErr);
+          }
+
           const req = await fetch("/api/reservations/cancel", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              Authorization: db.authStore.token ? `Bearer ${db.authStore.token}` : "",
+            },
             body: JSON.stringify({
               id: res.id,
               fullName: res.fullName,
               email: res.email,
             }),
           });
-          if (!req.ok) throw new Error("API Failed");
+          
+          if (!req.ok) throw new Error("API Email Request Failed");
           await fetchReservations();
           toast.success("Reservation cancelled & email sent.");
         } catch (err) {
@@ -206,7 +195,7 @@ export default function AdminReservations() {
                   ) : (
                     <CheckCircle2 size={16} />
                   )}
-                  Confirm
+                  Yes
                 </button>
               </div>
             </motion.div>
@@ -221,7 +210,7 @@ export default function AdminReservations() {
             Event Reservations
           </h2>
           <p className="text-stone-500 mt-2 font-medium">
-            Manage pending event tickets and digital dispatches
+            Manage event tickets and reservations
           </p>
         </div>
         <button
@@ -259,18 +248,14 @@ export default function AdminReservations() {
                   className={`px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold shadow-sm flex items-center gap-1.5 ${
                     res.status === "confirmed"
                       ? "bg-green-100 text-green-700 border border-green-200/60"
-                      : res.status === "pending"
-                        ? "bg-amber-100 text-amber-700 border border-amber-200/60"
-                        : "bg-rose-100 text-rose-700 border border-rose-200/60"
+                      : "bg-rose-100 text-rose-700 border border-rose-200/60"
                   }`}
                 >
                   <div
                     className={`w-1.5 h-1.5 rounded-full ${
                       res.status === "confirmed"
                         ? "bg-green-600"
-                        : res.status === "pending"
-                          ? "bg-amber-500 animate-pulse"
-                          : "bg-rose-600"
+                        : "bg-rose-600"
                     }`}
                   ></div>
                   {res.status}
@@ -304,7 +289,7 @@ export default function AdminReservations() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mt-2">
+                <div className={`grid gap-3 mt-2 ${res.makeDonation ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <div className="bg-stone-50 rounded-xl p-2.5 border border-stone-100 text-center flex flex-col justify-center">
                     <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">
                       Tickets
@@ -321,41 +306,30 @@ export default function AdminReservations() {
                       {res.needsChildcare ? "Yes" : "No"}
                     </span>
                   </div>
-                  <div className="bg-green-50/40 rounded-xl p-2.5 border border-green-100/60 text-center flex flex-col justify-center">
-                    <span className="block text-[10px] font-bold text-green-600/70 uppercase tracking-wider mb-0.5">
-                      Expected
-                    </span>
-                    <span className="block font-bold text-green-700 text-[17px]">
-                      ${Number(res.tickets) * 400}
-                    </span>
-                  </div>
+                  {res.makeDonation && (
+                    <div className="bg-[#8c9c74]/10 border-[#8c9c74]/20 rounded-xl p-2.5 border text-center flex flex-col justify-center">
+                      <span className="block text-[10px] font-bold text-[#8c9c74] uppercase tracking-wider mb-0.5">
+                        Donation
+                      </span>
+                      <span className="block font-bold text-[#7a8863] text-[17px]">
+                        ${res.donationAmount}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Actions */}
               <div className="px-6 py-4 bg-stone-50/80 border-t border-stone-100 flex justify-end gap-2 items-center">
-                {res.status === "pending" && (
-                  <button
-                    onClick={() => confirmReservation(res)}
-                    disabled={updating}
-                    className="flex-grow flex justify-center items-center gap-2 text-white bg-[#8c9c74] hover:bg-[#7a8863] py-2.5 rounded-xl text-[14px] font-semibold tracking-wide shadow-sm shadow-[#8c9c74]/20 transition active:scale-95 disabled:opacity-60"
-                  >
-                    <CheckCircle2 size={16} /> Approve & Send
-                  </button>
-                )}
                 {res.status !== "cancelled" && (
                   <button
                     onClick={() => cancelReservation(res)}
                     disabled={updating}
-                    title="Reject/Cancel"
-                    className={`p-2.5 rounded-xl text-stone-500 border border-stone-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition active:scale-95 disabled:opacity-50 ${res.status !== "pending" && "flex-grow flex justify-center items-center gap-2"}`}
+                    title="Cancel"
+                    className="flex-grow flex justify-center items-center gap-2 p-2.5 rounded-xl text-stone-500 border border-stone-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition active:scale-95 disabled:opacity-50"
                   >
-                    <X size={18} />{" "}
-                    {res.status !== "pending" && (
-                      <span className="text-sm font-semibold">
-                        Cancel Ticket
-                      </span>
-                    )}
+                    <X size={18} />
+                    <span className="text-sm font-semibold">Cancel</span>
                   </button>
                 )}
                 <button

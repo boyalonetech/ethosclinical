@@ -23,19 +23,51 @@ export default function ReservationPage() {
     phone: "",
     tickets: 1,
     needsChildcare: false,
+    makeDonation: false,
+    donationAmount: 0,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<"form" | "payment" | "success">("form");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStep("payment");
+
+    if (formData.makeDonation) {
+      setStep("payment");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        setIsSubmitting(false);
+        throw new Error(errorData?.error || "API Error");
+      }
+
+      setIsSubmitting(false);
+      setStep("success");
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error(
+        (error as Error)?.message ||
+          "Failed to submit reservation. Please try again.",
+      );
+    }
   };
 
   const handlePayment = async () => {
     setIsSubmitting(true);
-
     try {
       const res = await fetch("/api/reservations", {
         method: "POST",
@@ -57,7 +89,7 @@ export default function ReservationPage() {
       setIsSubmitting(false);
       toast.error(
         (error as Error)?.message ||
-          "Failed to confirm payment. Please try again.",
+          "Failed to process donation. Please try again.",
       );
     }
   };
@@ -68,7 +100,9 @@ export default function ReservationPage() {
     const value =
       e.target.type === "checkbox"
         ? (e.target as HTMLInputElement).checked
-        : e.target.value;
+        : e.target.type === "number"
+          ? Number(e.target.value)
+          : e.target.value;
     setFormData({
       ...formData,
       [e.target.name]: value,
@@ -393,18 +427,58 @@ export default function ReservationPage() {
                     </label>
                   </div>
 
+                  <div className="pt-2">
+                    <label className="flex items-start gap-4 p-5 border border-stone-200/80 bg-stone-50/50 rounded-2xl cursor-pointer hover:bg-stone-50 hover:border-stone-300 transition-all group">
+                      <div className="relative flex items-center justify-center mt-0.5 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          name="makeDonation"
+                          checked={formData.makeDonation}
+                          onChange={handleChange}
+                          className="peer w-6 h-6 appearance-none border-2 border-stone-300 rounded-[6px] focus:ring-4 focus:ring-[#8c9c74]/20 focus:outline-none checked:bg-[#8c9c74] checked:border-[#8c9c74] transition-all cursor-pointer"
+                        />
+                        <svg
+                          className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[15px] font-semibold text-stone-900 group-hover:text-stone-700 transition-colors">
+                          I would like to make a donation
+                        </span>
+                        <span className="text-[13px] text-stone-500 mt-1 leading-relaxed">
+                          Support this experience with a voluntary contribution
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+
                   <div className="pt-6 mt-6">
                     <button
                       type="submit"
-                      className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 flex items-center justify-center gap-3 text-[16px] group"
+                      disabled={isSubmitting}
+                      className="w-full bg-brown hover:bg-[#8c9c74] text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_8px_25px_rgba(140,156,116,0.3)] hover:-translate-y-0.5 flex items-center justify-center gap-3 text-[16px] group disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      <>
-                        Complete Registration{" "}
-                        <ArrowRight
-                          size={18}
-                          className="group-hover:translate-x-1 transition-transform"
-                        />
-                      </>
+                      {isSubmitting ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          Complete Registeration{" "}
+                          <ArrowRight
+                            size={18}
+                            className="group-hover:translate-x-1 transition-transform"
+                          />
+                        </>
+                      )}
                     </button>
 
                     <p className="text-center text-[13px] text-stone-400 mt-6 font-medium">
@@ -430,59 +504,79 @@ export default function ReservationPage() {
                 className="text-center py-10 flex flex-col items-center justify-center h-full min-h-[400px]"
               >
                 <h2 className="text-[2rem] font-bold text-stone-900 mb-4 tracking-tight">
-                  Complete Payment
+                  Complete Donation
                 </h2>
-                <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto">
-                  To finalise your reservation, please transfer the fee of
-                  <span className="font-bold text-stone-800">
-                    {" "}
-                    ${formData.tickets * 400} ({formData.tickets}{" "}
-                    {formData.tickets === 1 ? "ticket" : "tickets"}, $400 for
-                    each couple)
-                  </span>
-                  .
+                <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto text-center">
+                  {" "}
+                  For the support of this event, your donation is much appreciated.
                 </p>
 
-                <div className="bg-stone-50/80 border border-stone-200/50 rounded-xl p-5 mb-10 w-full max-w-[340px] text-left mx-auto">
-                  <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">
-                    Payment Details
-                  </h3>
-                  <div className="space-y-2 text-[14.5px]">
-                    <div className="flex justify-between">
-                      <span className="text-stone-500">Account Name:</span>
-                      <span className="font-semibold text-stone-800">
-                        Ethos Clinical
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-500">BSB:</span>
-                      <span className="font-semibold text-stone-800">
-                        123-456
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-500">Account Number:</span>
-                      <span className="font-semibold text-stone-800">
-                        1234 5678
-                      </span>
-                    </div>
-                  </div>
+                <div className="mb-10 w-full max-w-[340px] mx-auto">
+                  <label className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 block text-center">
+                    
+                  </label>
+                  <select
+                    name="donationAmount"
+                    value={formData.donationAmount}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-stone-200 rounded-lg text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#8c9c74] focus:border-transparent cursor-pointer"
+                  >
+                    <option value={0} disabled>Select Amount</option>
+                    <option value={25}>$25</option>
+                    <option value={50}>$50</option>
+                    <option value={100}>$100</option>
+                    <option value={200}>$200</option>
+                    <option value={400}>$400</option>
+                    <option value={500}>$500</option>
+                  </select>
                 </div>
 
-                <button
-                  onClick={handlePayment}
-                  disabled={isSubmitting}
-                  className="w-full max-w-[340px] h-14 bg-[#8c9c74] hover:bg-[#7a8863] text-white rounded-xl text-[16px] font-semibold tracking-wide transition-all shadow-md shadow-[#8c9c74]/20 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    "Payment Made"
-                  )}
-                </button>
+                {formData.donationAmount > 0 && (
+                  <>
+                    <div className="bg-stone-50/80 border border-stone-200/50 rounded-xl p-5 mb-10 w-full max-w-[380px] text-left mx-auto">
+                      <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">
+                        Payment Details
+                      </h3>
+                      <div className="space-y-2 text-[14.5px]">
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Account Name:</span>
+                          <span className="font-semibold text-stone-800 ">
+                            ETHOS CLINICAL SUPERVISION
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">BSB:</span>
+                          <span className="font-semibold text-stone-800">
+                            062-111
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">
+                            Account Number:
+                          </span>
+                          <span className="font-semibold text-stone-800">
+                            1139 1673
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handlePayment}
+                      disabled={isSubmitting}
+                      className="w-full max-w-[340px] h-14 bg-[#8c9c74] hover:bg-[#7a8863] text-white rounded-xl text-[16px] font-semibold tracking-wide transition-all shadow-md shadow-[#8c9c74]/20 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        "Continue"
+                      )}
+                    </button>
+                  </>
+                )}
               </motion.div>
             )}
 
@@ -524,6 +618,8 @@ export default function ReservationPage() {
                       phone: "",
                       tickets: 1,
                       needsChildcare: false,
+                      makeDonation: false,
+                      donationAmount: 0,
                     });
                   }}
                   className="px-8 py-3.5 border border-stone-200 rounded-xl text-stone-600 font-semibold hover:bg-stone-50 hover:text-stone-900 transition-all text-[14px] shadow-sm active:scale-95"
