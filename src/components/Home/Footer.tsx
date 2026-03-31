@@ -64,6 +64,16 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                {" "}
+                <a
+                  href="/admin"
+                  className="text-stone-600 text-sm hover:text-stone-900 transition-colors flex items-center gap-1.5"
+                >
+                  <ChevronRight size={12} className="text-stone-400" />
+                  Security
+                </a>
+              </li>
             </ul>
           </div>
 
