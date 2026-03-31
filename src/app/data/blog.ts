@@ -3,10 +3,12 @@ import { getPosts, PostRecord } from "@/backend/server";
 
 export interface Section {
   id: string;
-  type: "paragraph" | "heading" | "bulletList" | "numberedList";
+  type: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content: string;
   items?: string[];
+  quoteText?: string;
+  author?: string;
 }
 
 export interface BlogPost {
@@ -26,10 +28,13 @@ export interface BlogPost {
 
 // Define the structure of content from database
 interface DatabaseContent {
-  type?: "paragraph" | "heading" | "bulletList" | "numberedList";
+  id?: string;
+  type?: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content?: string;
   items?: string[];
+  quoteText?: string;
+  author?: string;
   sections?: Section[];
 }
 
@@ -42,11 +47,13 @@ const convertDatabaseContentToSections = (
   }
 
   return contentArray.map((item, index) => ({
-    id: `section-${Date.now()}-${index}`,
+    id: item.id || `section-${Date.now()}-${index}`,
     type: item.type || "paragraph",
     content: item.content || "",
     title: item.title || undefined,
     items: item.items || undefined,
+    quoteText: item.quoteText || undefined,
+    author: item.author || undefined,
   }));
 };
 

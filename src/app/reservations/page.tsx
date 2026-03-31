@@ -574,8 +574,14 @@ export default function ReservationPage() {
                       </h3>
                       <div className="space-y-2 text-[14.5px]">
                         <div className="flex justify-between">
-                          <span className="text-stone-500">Account Name:</span>
-                          <span className="font-semibold text-stone-800 ">
+                          <span className="text-stone-500">
+                            {" "}
+                            <span className="hidden lg:inline">
+                              Account
+                            </span>{" "}
+                            Name:
+                          </span>
+                          <span className="font-semibold text-xs text-stone-800 ">
                             ETHOS CLINICAL SUPERVISION
                           </span>
                         </div>

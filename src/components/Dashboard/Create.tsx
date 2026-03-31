@@ -17,6 +17,7 @@ import {
   Layout,
   AlertCircle,
   ArrowLeft,
+  Quote,
 } from "lucide-react";
 import {
   getPosts,
@@ -32,10 +33,12 @@ import { motion } from "framer-motion";
 
 interface Section {
   id: string;
-  type: "paragraph" | "heading" | "bulletList" | "numberedList";
+  type: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content: string;
   items?: string[];
+  quoteText?: string;
+  author?: string;
 }
 
 interface BlogFormData {
@@ -452,6 +455,8 @@ function CreatePostForm({
       content: "",
       items:
         type === "bulletList" || type === "numberedList" ? [""] : undefined,
+      quoteText: type === "quote" ? "" : undefined,
+      author: type === "quote" ? "" : undefined,
     };
     setFormData((prev) => ({ ...prev, sections: [...prev.sections, s] }));
     setActiveSection(s.id);
@@ -621,6 +626,29 @@ function CreatePostForm({
                 <Plus size={14} /> Add item
               </button>
             </div>
+            </div>
+          );
+
+      case "quote":
+        return (
+          <div className="space-y-3">
+            <textarea
+              value={section.quoteText || ""}
+              onChange={(e) =>
+                updateSection(section.id, { quoteText: e.target.value })
+              }
+              className="w-full px-4 py-3 bg-gray-50 placeholder-gray-500 border-0 rounded-lg text-black focus:ring-1 focus:ring-[#8e9867] focus:outline-none transition-all min-h-[100px]"
+              placeholder="Enter quote text..."
+            />
+            <input
+              type="text"
+              value={section.author || ""}
+              onChange={(e) =>
+                updateSection(section.id, { author: e.target.value })
+              }
+              className="w-full px-4 py-2 bg-gray-50 border-0 border-b-2 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all text-black placeholder-gray-500"
+              placeholder="Author name"
+            />
           </div>
         );
 
@@ -742,6 +770,20 @@ function CreatePostForm({
                     ))}
                   </ol>
                 </div>
+              );
+            case "quote":
+              return (
+                <blockquote
+                  key={section.id}
+                  className="my-8 p-6 bg-[#8e9867]/5 border-l-4 border-[#8e9867] rounded-r-xl"
+                >
+                  <p className="text-lg italic text-gray-700 leading-relaxed">
+                    &ldquo;{section.quoteText || "Quote text"}&rdquo;
+                  </p>
+                  <p className="mt-3 text-sm text-gray-500">
+                    — {section.author || "Anonymous"}
+                  </p>
+                </blockquote>
               );
             default:
               return (
@@ -965,6 +1007,7 @@ function CreatePostForm({
                   label: "Numbered List",
                   icon: <ListOrdered size={16} />,
                 },
+                { type: "quote", label: "Quote", icon: <Quote size={16} /> },
               ] as {
                 type: Section["type"];
                 label: string;
@@ -1015,7 +1058,9 @@ function CreatePostForm({
                         ? "Bullet List"
                         : section.type === "numberedList"
                           ? "Numbered List"
-                          : "Paragraph"}
+                          : section.type === "quote"
+                            ? "Quote"
+                            : "Paragraph"}
                   </span>
                 </div>
                 {renderSectionEditor(section)}

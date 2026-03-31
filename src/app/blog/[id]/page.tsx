@@ -616,6 +616,14 @@ export default function BlogPostPage() {
                 </ol>
               </motion.div>
             );
+          case "quote":
+            return (
+              <InteractiveQuote
+                key={section.id}
+                text={section.quoteText || section.content || "Quote text"}
+                author={section.author || "Anonymous"}
+              />
+            );
           case "paragraph":
           default:
             const isFirst = !firstParagraphFound;
@@ -645,10 +653,6 @@ export default function BlogPostPage() {
                       </p>
                     )}
                   </motion.div>
-                  <InteractiveQuote
-                    text="The only way to do great work is to love what you do."
-                    author="Steve Jobs"
-                  />
                 </div>
               );
             }
