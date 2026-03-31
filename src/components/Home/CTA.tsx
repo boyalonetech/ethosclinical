@@ -9,11 +9,11 @@ export default function CTABanner() {
           {/* Background Image */}
           <div
             className="absolute inset-0  z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/cta.png')" }}
+            style={{ backgroundImage: "url('/ctab.jpeg')" }}
           />
 
           {/* Overlay */}
-          <div className="absolute inset-0 z-10 bg-black/20" />
+          <div className="absolute inset-0 z-10 bg-black/50" />
 
           {/* Decorative dots */}
           {[
@@ -47,7 +47,7 @@ export default function CTABanner() {
               }
               className="bg-mint hover:bg-brown text-white text-sm font-medium px-6 py-3.5 rounded-md transition-colors inline-flex items-center gap-2"
             >
-              Book a Counsellor <ArrowRight size={16} />
+              Book a Supervisor <ArrowRight size={16} />
             </button>
           </div>
         </div>
