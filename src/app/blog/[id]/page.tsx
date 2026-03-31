@@ -80,7 +80,7 @@ function NewsletterSignup() {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="mt-16 p-8 bg-gradient-to-r from-[#8E9867]/5 to-[#8E9867]/10 rounded-2xl border border-[#8E9867]/20"
+      className="mt-16 p-8 bg-gradient-to-r hidden from-[#8E9867]/5 to-[#8E9867]/10 rounded-2xl border border-[#8E9867]/20"
     >
       <div className="text-center">
         <h4 className="text-lg font-semibold text-stone-800 mb-2">
@@ -196,7 +196,12 @@ interface ArticleActionsProps {
   isLiked: boolean;
 }
 
-function ArticleActions({ onShare, onLike, likes, isLiked }: ArticleActionsProps) {
+function ArticleActions({
+  onShare,
+  onLike,
+  likes,
+  isLiked,
+}: ArticleActionsProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
@@ -344,7 +349,7 @@ function FontSizeControl() {
 // Bookmark Button
 function BookmarkButton() {
   const [isBookmarked, setIsBookmarked] = useState(() => {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === "undefined") return false;
     const saved = localStorage.getItem("bookmarkedPosts");
     if (!saved) return false;
     const bookmarks = JSON.parse(saved);
