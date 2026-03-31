@@ -21,6 +21,57 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { getBlogPosts, BlogPost, CATEGORY_COLORS } from "@/app/data/blog";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 
+// Helper function to convert URLs to clickable links
+function convertUrlsToLinks(text: string): React.ReactNode {
+  if (!text) return text;
+
+  // Regular expression to match URLs
+  const urlRegex =
+    /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(com|org|net|edu|gov|io|co|au|uk|ca|us|info|biz|me|tv|app|dev)(?:\/[^\s]*)?)/gi;
+
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    // Check if this part is a URL
+    const isUrl = urlRegex.test(part);
+    // Reset regex lastIndex
+    urlRegex.lastIndex = 0;
+
+    console.log(isUrl);
+    if (
+      part &&
+      (part.match(/^(https?:\/\/)/i) ||
+        part.match(/^www\./i) ||
+        part.match(
+          /^[a-zA-Z0-9-]+\.(com|org|net|edu|gov|io|co|au|uk|ca|us|info|biz|me|tv|app|dev)(?:\/|$)/i,
+        ))
+    ) {
+      let href = part;
+      if (!href.startsWith("http://") && !href.startsWith("https://")) {
+        href = "https://" + href;
+      }
+      return (
+        <a
+          key={index}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#8E9867] hover:text-[#7d8559] underline underline-offset-2 transition-colors break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
+// Function to render content with URL conversion
+function renderTextWithLinks(text: string): React.ReactNode {
+  if (!text) return text;
+  return convertUrlsToLinks(text);
+}
+
 // Enhanced Toast Component with animation
 function Toast({
   message,
@@ -165,7 +216,7 @@ function InteractiveQuote({ text, author }: { text: string; author: string }) {
         <Quote size={24} className="text-[#8E9867] flex-shrink-0" />
         <div>
           <p className="text-lg italic text-stone-700 leading-relaxed">
-            &ldquo;{text}&rdquo;
+            &ldquo;{renderTextWithLinks(text)}&rdquo;
           </p>
           <AnimatePresence>
             {isExpanded && (
@@ -175,7 +226,7 @@ function InteractiveQuote({ text, author }: { text: string; author: string }) {
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-3 text-sm text-stone-500"
               >
-                — {author}
+                — {renderTextWithLinks(author)}
               </motion.p>
             )}
           </AnimatePresence>
@@ -546,14 +597,14 @@ export default function BlogPostPage() {
               >
                 {section.title && (
                   <h2 className="text-[#8E9867] text-2xl md:text-3xl font-semibold leading-tight tracking-tight border-l-4 border-[#8E9867] pl-4">
-                    {section.title}
+                    {renderTextWithLinks(section.title)}
                   </h2>
                 )}
                 <p
                   className="text-stone-800 text-[18px] md:text-[20px] font-normal leading-[1.8] font-serif"
                   style={{ fontSize: "var(--article-font-size, 100%)" }}
                 >
-                  {section.content}
+                  {renderTextWithLinks(section.content)}
                 </p>
               </motion.div>
             );
@@ -566,7 +617,7 @@ export default function BlogPostPage() {
               >
                 {section.title && (
                   <p className="text-stone-800 text-lg font-bold leading-relaxed tracking-wide uppercase text-[13px]">
-                    {section.title}
+                    {renderTextWithLinks(section.title)}
                   </p>
                 )}
                 <ul className="space-y-3">
@@ -582,7 +633,7 @@ export default function BlogPostPage() {
                         <div className="w-2.5 h-2.5 bg-[#8E9867] rounded-full" />
                       </div>
                       <p className="text-stone-700 text-[17px] font-medium leading-relaxed">
-                        {item}
+                        {renderTextWithLinks(item)}
                       </p>
                     </motion.li>
                   ))}
@@ -598,7 +649,7 @@ export default function BlogPostPage() {
               >
                 {section.title && (
                   <p className="text-stone-800 text-xl font-semibold leading-relaxed">
-                    {section.title}
+                    {renderTextWithLinks(section.title)}
                   </p>
                 )}
                 <ol className="list-decimal pl-6 space-y-3 font-serif">
@@ -610,7 +661,7 @@ export default function BlogPostPage() {
                       transition={{ delay: idxx * 0.1 }}
                       className="text-stone-700 text-[18px] pl-4 font-normal leading-[1.8] marker:text-[#8E9867] marker:font-bold"
                     >
-                      {item}
+                      {renderTextWithLinks(item)}
                     </motion.li>
                   ))}
                 </ol>
@@ -642,14 +693,14 @@ export default function BlogPostPage() {
                         <span className="float-left text-6xl md:text-7xl font-serif text-[#8E9867] mt-1 mr-4 mb-2 leading-[0.8] font-bold">
                           {section.content.charAt(0)}
                         </span>
-                        {section.content.slice(1)}
+                        {renderTextWithLinks(section.content.slice(1))}
                       </p>
                     ) : (
                       <p
                         className="text-stone-700 text-[18px] md:text-[20px] font-serif font-normal leading-[1.8]"
                         style={{ fontSize: "var(--article-font-size, 100%)" }}
                       >
-                        {section.content}
+                        {renderTextWithLinks(section.content)}
                       </p>
                     )}
                   </motion.div>
@@ -667,14 +718,14 @@ export default function BlogPostPage() {
                     <span className="float-left text-6xl md:text-7xl font-serif text-[#8E9867] mt-1 mr-4 mb-2 leading-[0.8] font-bold">
                       {section.content.charAt(0)}
                     </span>
-                    {section.content.slice(1)}
+                    {renderTextWithLinks(section.content.slice(1))}
                   </p>
                 ) : (
                   <p
                     className="text-stone-700 text-[18px] md:text-[20px] font-serif font-normal leading-[1.8]"
                     style={{ fontSize: "var(--article-font-size, 100%)" }}
                   >
-                    {section.content}
+                    {renderTextWithLinks(section.content)}
                   </p>
                 )}
               </motion.div>
@@ -692,7 +743,7 @@ export default function BlogPostPage() {
           className="space-y-4"
         >
           <p className="text-stone-700 text-[18px] font-serif font-normal leading-[1.8]">
-            {post.excerpt}
+            {renderTextWithLinks(post.excerpt)}
           </p>
         </motion.div>
       );
@@ -837,13 +888,13 @@ export default function BlogPostPage() {
 
               {/* Title */}
               <h1 className="text-3xl md:text-5xl lg:text-[54px] text-stone-900 text-center font-serif font-medium leading-[1.1] mb-6 tracking-tight">
-                {post.title}
+                {renderTextWithLinks(post.title)}
               </h1>
 
               {/* Subtitle */}
               {post.subtitle && (
                 <p className="text-xl md:text-2xl text-stone-600 text-center font-serif italic mb-8 max-w-2xl mx-auto">
-                  {post.subtitle}
+                  {renderTextWithLinks(post.subtitle)}
                 </p>
               )}
             </motion.div>
@@ -857,7 +908,7 @@ export default function BlogPostPage() {
             >
               <span className="flex items-center gap-1.5">
                 <User size={14} className="text-[#8E9867]" />
-                {post.author}
+                {renderTextWithLinks(post.author)}
               </span>
               <span className="flex items-center gap-1.5">
                 <Calendar size={14} className="text-[#8E9867]" />
