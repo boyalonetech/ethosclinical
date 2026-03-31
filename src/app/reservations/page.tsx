@@ -28,6 +28,7 @@ export default function ReservationPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [customAmount, setCustomAmount] = useState("");
   const [step, setStep] = useState<"form" | "payment" | "success">("form");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,13 +69,22 @@ export default function ReservationPage() {
 
   const handlePayment = async () => {
     setIsSubmitting(true);
+
+    const donationData = {
+      ...formData,
+      donationAmount:
+        formData.donationAmount === -1
+          ? Number(customAmount)
+          : formData.donationAmount,
+    };
+
     try {
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(donationData),
       });
 
       if (!res.ok) {
@@ -508,30 +518,55 @@ export default function ReservationPage() {
                 </h2>
                 <p className="text-[16px] text-stone-500 mb-8 leading-relaxed max-w-[340px] mx-auto text-center">
                   {" "}
-                  For the support of this event, your donation is much appreciated.
+                  For the support of this event, your donation is much
+                  appreciated.
                 </p>
 
                 <div className="mb-10 w-full max-w-[340px] mx-auto">
-                  <label className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 block text-center">
-                    
-                  </label>
+                  <label className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 block text-center"></label>
                   <select
                     name="donationAmount"
-                    value={formData.donationAmount}
-                    onChange={handleChange}
+                    value={
+                      formData.donationAmount === -1
+                        ? ""
+                        : formData.donationAmount
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === "other") {
+                        setFormData({ ...formData, donationAmount: -1 });
+                      } else {
+                        handleChange(e);
+                      }
+                    }}
                     className="w-full px-4 py-3 border border-stone-200 rounded-lg text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#8c9c74] focus:border-transparent cursor-pointer"
                   >
-                    <option value={0} disabled>Select Amount</option>
+                    <option value="">Click to Select Amount</option>
                     <option value={25}>$25</option>
                     <option value={50}>$50</option>
                     <option value={100}>$100</option>
-                    <option value={200}>$200</option>
-                    <option value={400}>$400</option>
-                    <option value={500}>$500</option>
+                    <option value="other">Other amount</option>
                   </select>
                 </div>
 
-                {formData.donationAmount > 0 && (
+                {formData.donationAmount === -1 && (
+                  <div className="mb-6 w-full max-w-[340px] mx-auto">
+                    <input
+                      type="number"
+                      name="customDonation"
+                      min={1}
+                      placeholder="Enter amount ($)"
+                      value={customAmount}
+                      className="w-full px-4 py-3 border border-stone-200 rounded-lg text-stone-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#8c9c74] focus:border-transparent"
+                      onChange={(e) => {
+                        setCustomAmount(e.target.value);
+                      }}
+                    />
+                  </div>
+                )}
+
+                {(formData.donationAmount > 0 ||
+                  (formData.donationAmount === -1 &&
+                    Number(customAmount) > 0)) && (
                   <>
                     <div className="bg-stone-50/80 border border-stone-200/50 rounded-xl p-5 mb-10 w-full max-w-[380px] text-left mx-auto">
                       <h3 className="text-[13px] font-bold tracking-widest uppercase text-stone-600 mb-3 border-b border-stone-200 pb-2">
@@ -621,6 +656,7 @@ export default function ReservationPage() {
                       makeDonation: false,
                       donationAmount: 0,
                     });
+                    setCustomAmount("");
                   }}
                   className="px-8 py-3.5 border border-stone-200 rounded-xl text-stone-600 font-semibold hover:bg-stone-50 hover:text-stone-900 transition-all text-[14px] shadow-sm active:scale-95"
                 >
