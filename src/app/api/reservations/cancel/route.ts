@@ -3,7 +3,8 @@ import nodemailer from "nodemailer";
 import PocketBase from "pocketbase";
 import fs from "fs";
 
-const database = process.env.NEXT_PUBLIC_DATABASE_API || "http://127.0.0.1:8090";
+const database =
+  process.env.NEXT_PUBLIC_DATABASE_API || "http://127.0.0.1:8090";
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,10 @@ export async function POST(request: Request) {
     const { id, fullName, email } = await request.json();
 
     if (!id || !email) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     // Init custom pocketbase client and load provided authentication token
@@ -24,7 +28,9 @@ export async function POST(request: Request) {
     try {
       await pb.collection("reservations").update(id, { status: "cancelled" });
     } catch {
-      console.warn("API was restricted from updating the database directly. Relying on frontend proxy.");
+      console.warn(
+        "API was restricted from updating the database directly. Relying on frontend proxy.",
+      );
     }
 
     // Send the email
@@ -71,12 +77,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-
   } catch (error: unknown) {
     console.error("Cancel api error:", error);
     try {
       const err = error as Error;
-      fs.writeFileSync('/tmp/debug.txt', String(err?.stack || err?.message || error));
+      fs.writeFileSync(
+        "/tmp/debug.txt",
+        String(err?.stack || err?.message || error),
+      );
     } catch {
       // ignore
     }
