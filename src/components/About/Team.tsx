@@ -1,7 +1,7 @@
 export default function Team() {
   const avatarImages = [
     "/stephen.jpeg  ",
-    "/elvis.jpeg",
+    "/elvis_pro.jpeg",
     "https://lh3.googleusercontent.com/p/AF1QipPU82NcntaGuFlqGW8wJoKJdOSkSO5jS1Ojd0-z=s1360-w1360-h1020-rw",
     "/team2.jpg",
     "/team1.jpg",
@@ -15,7 +15,7 @@ export default function Team() {
     },
     {
       name: "Elvis Nwoke",
-      role: "IT Specialist",
+      role: "CTO",
       quote: "Your story matters, and so does your voice.",
     },
 
