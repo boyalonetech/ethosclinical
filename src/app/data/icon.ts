@@ -1,10 +1,16 @@
 // src/app/data/icon.ts
-import { Instagram, Twitter, Linkedin, Facebook } from "lucide-react";
+import { Instagram, Twitter, Youtube, Facebook } from "lucide-react";
 
 export const SOCIAL_ICONS = [
-  { icon: Instagram, label: "Instagram" },
-  { icon: Twitter, label: "Twitter" },
-  { icon: Linkedin, label: "LinkedIn" },
+  {
+    icon: Instagram,
+    label: "Instagram",
+  },
+  {
+    icon: Twitter,
+    label: "Twitter",
+  },
+  { icon: Youtube, label: "Youtube" },
   { icon: Facebook, label: "Facebook" },
 ];
 

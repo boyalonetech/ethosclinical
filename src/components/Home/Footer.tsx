@@ -35,7 +35,7 @@ export default function Footer() {
               {SOCIAL_ICONS.map(({ icon: Icon, label }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={label === "Instagram" ? "https://www.instagram.com/ethosclinicalsupervision?igsh=MXhnYnU0NHE1Z2FxdQ%3D%3D&utm_source=qr" : label === "Twitter" ? "https://x.com/ethos_clinical?s=11" : label === "Facebook" ? "https://www.facebook.com" : label === "Youtube" ? "https://youtube.com/@ethosclinicalsupervision?si=1B_aI_G0OwF2b-Mh" : "#" }
                   aria-label={label}
                   className="w-9 h-9 rounded-xl text-mintl hover:text-white hover:bg-mint flex items-center justify-center transition-colors"
                 >

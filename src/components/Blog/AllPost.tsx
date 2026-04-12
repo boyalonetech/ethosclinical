@@ -8,11 +8,13 @@ import { useEffect, useMemo, useState } from "react";
 interface BlogPageProps {
   searchQuery?: string;
   onPostsLoaded?: (posts: BlogPost[]) => void;
+  onMatchFound?: () => void;
 }
 
 export default function BlogPage({
   searchQuery = "",
   onPostsLoaded,
+  onMatchFound,
 }: BlogPageProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>([]);
