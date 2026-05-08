@@ -608,6 +608,26 @@ export default function BlogPostPage() {
                 </p>
               </motion.div>
             );
+          case "subHeading":
+            return (
+              <motion.div
+                key={section.id}
+                className="space-y-4 my-8"
+                {...motionProps}
+              >
+                {section.title && (
+                  <h3 className="text-[#8B4513] text-xl md:text-2xl font-semibold leading-tight tracking-tight">
+                    {renderTextWithLinks(section.title)}
+                  </h3>
+                )}
+                <p
+                  className="text-stone-700 text-[17px] md:text-[19px] font-normal leading-[1.7] font-serif"
+                  style={{ fontSize: "var(--article-font-size, 100%)" }}
+                >
+                  {renderTextWithLinks(section.content)}
+                </p>
+              </motion.div>
+            );
           case "bulletList":
             return (
               <motion.div

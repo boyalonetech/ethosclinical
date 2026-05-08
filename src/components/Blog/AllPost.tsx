@@ -14,7 +14,6 @@ interface BlogPageProps {
 export default function BlogPage({
   searchQuery = "",
   onPostsLoaded,
-  onMatchFound,
 }: BlogPageProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>([]);

@@ -33,7 +33,7 @@ import { motion } from "framer-motion";
 
 interface Section {
   id: string;
-  type: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
+  type: "paragraph" | "heading" | "subHeading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content: string;
   items?: string[];
@@ -559,6 +559,7 @@ function CreatePostForm({
   const renderSectionEditor = (section: Section) => {
     switch (section.type) {
       case "heading":
+      case "subHeading":
         return (
           <div className="space-y-3">
             <input
@@ -567,8 +568,8 @@ function CreatePostForm({
               onChange={(e) =>
                 updateSection(section.id, { title: e.target.value })
               }
-              className="w-full px-4 py-2 bg-gray-50 border-0 border-b-2 text-black placeholder-gray-500 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all text-lg font-medium"
-              placeholder="Heading title"
+              className={`w-full px-4 py-2 bg-gray-50 border-0 border-b-2 text-black placeholder-gray-500 border-gray-200 focus:border-[#8e9867] focus:outline-none transition-all ${section.type === "heading" ? "text-lg font-medium" : "text-md font-semibold text-[#8B4513]"} `}
+              placeholder={section.type === "heading" ? "Heading title" : "Sub-heading title"}
             />
             <textarea
               value={section.content}
@@ -576,7 +577,7 @@ function CreatePostForm({
                 updateSection(section.id, { content: e.target.value })
               }
               className="w-full px-4 py-3 bg-gray-50 placeholder-gray-500 border-0 rounded-lg text-black focus:ring-1 focus:ring-[#8e9867] focus:outline-none transition-all min-h-[100px]"
-              placeholder="Write your heading content..."
+              placeholder={section.type === "heading" ? "Write your heading content..." : "Write your sub-heading content..."}
             />
           </div>
         );
@@ -730,6 +731,19 @@ function CreatePostForm({
                   )}
                   <p className="text-gray-700 leading-relaxed">
                     {section.content || "[Empty heading content]"}
+                  </p>
+                </div>
+              );
+            case "subHeading":
+              return (
+                <div key={section.id} className="space-y-3">
+                  {section.title && (
+                    <h3 className="text-xl font-semibold text-[#8B4513]">
+                      {section.title}
+                    </h3>
+                  )}
+                  <p className="text-gray-700 leading-relaxed text-sm">
+                    {section.content || "[Empty sub-heading content]"}
                   </p>
                 </div>
               );
@@ -998,6 +1012,11 @@ function CreatePostForm({
                 },
                 { type: "heading", label: "Heading", icon: <Type size={16} /> },
                 {
+                  type: "subHeading",
+                  label: "Sub Heading",
+                  icon: <Type size={14} />,
+                },
+                {
                   type: "bulletList",
                   label: "Bullet List",
                   icon: <List size={16} />,
@@ -1054,7 +1073,9 @@ function CreatePostForm({
                   <span className="text-xs font-mono text-gray-400 uppercase">
                     {section.type === "heading"
                       ? "Heading"
-                      : section.type === "bulletList"
+                      : section.type === "subHeading"
+                        ? "Sub Heading"
+                        : section.type === "bulletList"
                         ? "Bullet List"
                         : section.type === "numberedList"
                           ? "Numbered List"

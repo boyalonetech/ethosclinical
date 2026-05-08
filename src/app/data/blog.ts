@@ -3,7 +3,7 @@ import { getPosts, PostRecord } from "@/backend/server";
 
 export interface Section {
   id: string;
-  type: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
+  type: "paragraph" | "heading" | "subHeading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content: string;
   items?: string[];
@@ -29,7 +29,7 @@ export interface BlogPost {
 // Define the structure of content from database
 interface DatabaseContent {
   id?: string;
-  type?: "paragraph" | "heading" | "bulletList" | "numberedList" | "quote";
+  type?: "paragraph" | "heading" | "subHeading" | "bulletList" | "numberedList" | "quote";
   title?: string;
   content?: string;
   items?: string[];
