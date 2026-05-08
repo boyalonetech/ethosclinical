@@ -616,7 +616,7 @@ export default function BlogPostPage() {
                 {...motionProps}
               >
                 {section.title && (
-                  <h3 className="text-[#8B4513] text-xl md:text-2xl font-semibold leading-tight tracking-tight">
+                  <h3 className="text-[#8E9867] text-xl md:text-xl font-semibold leading-tight tracking-tight">
                     {renderTextWithLinks(section.title)}
                   </h3>
                 )}
@@ -752,21 +752,6 @@ export default function BlogPostPage() {
             );
         }
       });
-    }
-
-    if (post.excerpt) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="space-y-4"
-        >
-          <p className="text-stone-700 text-[18px] font-serif font-normal leading-[1.8]">
-            {renderTextWithLinks(post.excerpt)}
-          </p>
-        </motion.div>
-      );
     }
 
     return (
@@ -907,9 +892,28 @@ export default function BlogPostPage() {
               </div>
 
               {/* Title */}
-              <h1 className="text-3xl md:text-5xl lg:text-[54px] text-stone-900 text-center font-serif font-medium leading-[1.1] mb-6 tracking-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-[58px] text-stone-900 text-center font-serif font-medium leading-[1.1] mb-6 tracking-tight">
                 {renderTextWithLinks(post.title)}
               </h1>
+
+              {/* High-End Featured Lead for Excerpt */}
+              {post.excerpt && (
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="mb-14 relative"
+                >
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-brown"></div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-[#fcfbf9] px-6 md:px-12 text-brown text-[20px] md:text-[28px] font-serif font-medium italic leading-relaxed text-center tracking-tight max-w-4xl">
+                      {renderTextWithLinks(post.excerpt)}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Subtitle */}
               {post.subtitle && (
