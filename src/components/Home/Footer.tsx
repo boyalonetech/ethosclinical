@@ -41,7 +41,7 @@ export default function Footer() {
                       : label === "Twitter"
                         ? "https://x.com/ethos_clinical?s=11"
                         : label === "Facebook"
-                          ? "https://www.facebook.com"
+                          ? "https://www.facebook.com/share/18Tbo8FpXu/"
                           : label === "Youtube"
                             ? "https://youtube.com/@ethosclinicalsupervision?si=1B_aI_G0OwF2b-Mh"
                             : "#"
