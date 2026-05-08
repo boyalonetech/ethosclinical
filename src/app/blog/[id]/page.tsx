@@ -902,12 +902,15 @@ export default function BlogPostPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
-                  className="mb-14 relative"
+                  className="mb-8  relative"
                 >
-                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div
+                    className="absolute inset-0 flex items-center"
+                    aria-hidden="true"
+                  >
                     <div className="w-full border-t border-brown"></div>
                   </div>
-                  <div className="relative flex justify-center">
+                  <div className="relative flex justify-center ">
                     <span className="bg-[#fcfbf9] px-6 md:px-12 text-brown text-[20px] md:text-[28px] font-serif font-medium italic leading-relaxed text-center tracking-tight max-w-4xl">
                       {renderTextWithLinks(post.excerpt)}
                     </span>
