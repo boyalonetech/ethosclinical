@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { id: "posts", label: "Posts", icon: FileText },
   { id: "bookings", label: "Bookings", icon: CalendarCheck },
   { id: "reservations", label: "Reservations", icon: CalendarDays },
+  { id: "invoice", label: "Invoices", icon: FileText },
 ];
 
 export default function Sidebar({ onPageChange, activePage, onLogout }: SidebarProps) {

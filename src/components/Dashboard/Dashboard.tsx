@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Create from "./Create";
 import Bookings from "./Bookings";
 import Reservations from "./Reservations";
+import Invoice from "./Invoice";
 import { Menu, X } from "lucide-react";
 
 interface DashboardProps {
@@ -27,6 +28,8 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         return <Bookings />;
       case "reservations":
         return <Reservations />;
+      case "invoice":
+        return <Invoice />;
       default:
         return <Create />;
     }
